@@ -41,7 +41,7 @@ typedef struct{
 
 typedef struct{
 
-    char **nome;
+    char ***nome;
     int **tempo;
 }Ranking;
 
@@ -118,14 +118,17 @@ void opcoes();
 void limpamatriz(int **mat, int n);
 void montarTab(Tabela t, Soma vet);
 void limpavetor(int *vet);
+void guardaRanking(Geral g);
 
 Soma criaLinhaColuna(Tabela tab);
 
 Geral jogo(Tabela t, Soma s, Jogador j, int parametro);
 Geral abreArquivo(char * nome_arq);
 
-Ranking abreArquivo(Ranking r);
+Ranking armazenaRanking(Ranking r);
 int verificaVitoria(Tabela t);
+
+char * dividePalavra(char *op);
 
 int * criaVetor(int n);
 
