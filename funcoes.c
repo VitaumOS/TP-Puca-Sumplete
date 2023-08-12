@@ -92,7 +92,7 @@ Geral abreArquivo(char * nome_arq){
 
     FILE *arq=fopen(nome_arq,"r");
     Geral g;
-    fscanf(arq,"%d\n", &g.t.tam);
+    fscanf(arq,"%d", &g.t.tam);
     int n=g.t.tam;
     g.t.mat=criaMatriz(g.t.tam);
     g.t.resposta=criaMatriz(g.t.tam);
@@ -101,31 +101,29 @@ Geral abreArquivo(char * nome_arq){
 
     for(int i=0; i<n; i++){
         for(int j=0; j<n; j++){
-            fscanf(arq,"%d ", &g.t.mat[i][j]);
+            fscanf(arq,"%d", &g.t.mat[i][j]);
         }
-        fprintf(arq,"\n");
+    }
+    for(int i=0; i<n; i++){
+        fscanf(arq,"%d",&g.s.linha[i]);
     }
 
     for(int i=0; i<n; i++){
-        fscanf(arq,"%d ",&g.s.linha[i]);
+        fscanf(arq,"%d",&g.s.coluna[i]);
     }
-    fprintf(arq,"\n");
-    for(int i=0; i<n; i++){
-        fscanf(arq,"%d ",&g.s.coluna[i]);
-    }
-    fprintf(arq,"\n");
-    fscanf(arq,"%d\n", &g.t.quant_manter);
+
+    fscanf(arq,"%d", &g.t.quant_manter);
     int l, c;
     for(int i=0; i<g.t.quant_manter; i++){
-        fscanf(arq,"%d %d\n",&l,&c);
-        g.t.resposta[l][c]=1;
+        fscanf(arq,"%d %d",&l,&c);
+        g.t.resposta[l-1][c-1]=1;
     }
-    fscanf(arq,"%d\n", &g.t.quant_remover);
+    fscanf(arq,"%d", &g.t.quant_remover);
     for(int i=0; i<g.t.quant_remover; i++){
-        fscanf(arq,"%d %d\n",&l,&c);
-        g.t.resposta[l][c]=2;
+        fscanf(arq,"%d %d",&l,&c);
+        g.t.resposta[l-1][c-1]=2;
     }
-    fscanf(arq,"%s\n",g.j.nome);
+    fgets(g.j.nome,sizeof(g.j.nome),arq);
     fscanf(arq,"%d", &g.j.TempoT);
 
     fclose(arq);
