@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <string.h>
+#include <math.h>
 #include "funcoes.h"
 
 void opcoes(){
@@ -16,7 +17,7 @@ void opcoes(){
     do{
         printf("Bem vindo ao Jogo SUMPLETE!\n");
 
-        printf("0. Sair do Jogo!!!\n");
+        printf("0. Sair do Jogo\n");
         printf("1. Começar um novo jogo\n");
         printf("2. Continuar um jogo salvo em arquivo\n");
         printf("3. Continuar o jogo atual\n");
@@ -86,6 +87,80 @@ void opcoes(){
 void limparBuffer() {
     int c;
     while ((c = getchar()) != '\n' && c != EOF);
+}
+
+void guardaRanking(Geral g){
+
+    Ranking ranking;
+
+    ranking.nome=malloc(9*sizeof(char*));
+    ranking.tempo=calloc(9,sizeof(int*));
+    for(int i=0; i<9;i++){
+        ranking.nome[i]=malloc(QUANTJOGADOR*sizeof(char));
+        ranking.tempo[i]=calloc(QUANTJOGADOR,sizeof(int));
+    }
+
+
+
+
+
+}
+
+Ranking armazenaRanking(Ranking r){
+
+    FILE *arq=fopen("sumplete.ini", "r");
+    char linha[M], *primeiraPalavra, nome[TAM];
+    int n,tam, tam_total, aux=0;
+
+    while(!feof(arq)){
+
+        fgets(linha, M, arq);
+        primeiraPalavra=dividePalavra(linha);
+        if(!strcmp(linha, "size")){
+
+            n=linha[7];
+            do{
+                int i=0;
+
+                    fgets(linha, M, arq);
+                    limparBuffer();
+                    tam_total=strlen(linha);
+                    primeiraPalavra=dividePalavra(linha);
+                    tam=strlen(primeiraPalavra);
+                    primeiraPalavra[tam-1]='\0';
+                    
+                    if(!strcmp(linha,"player")){
+                        aux=0;
+                        for(int j=tam+3; j<linha; j++){
+                            nome[aux]=primeiraPalavra[j];
+                            aux++;
+                        }
+                        strcpy(r.nome[n][i],nome );   
+
+                    }
+
+                    else if(!strcmp(linha, "time")){
+                        aux=0;
+                        for(int j=tam+3; j<linha-1; j++){
+                            nome[aux]=linha[j];
+                            aux++;
+                        }
+                        char numero[2];
+                        for(int j=0; j<=aux; j++){
+                            numero[0]=nome[j];
+                            numero[1]='\0';
+                            r.tempo[n][i]+=atoi(numero)*pow(10,aux);
+                            aux--;
+                        }
+                        
+                    }
+
+                    
+                i++;
+            }while(!strcmp(linha, ""));
+        }   
+    }
+    return r;
 }
 
 Geral abreArquivo(char * nome_arq){
@@ -183,7 +258,7 @@ Geral jogo(Tabela t, Soma s, Jogador j, int parametro){
         t.mat=criaMatriz(t.tam);
         t.resposta=criaMatriz(t.tam);
         t.mat=geravalores(t.mat, t.tam);
-        t.espelho=criarMatrizEspelho(t.tam);
+        t.gabarito=criarMatrizEspelho(t.tam);
         s=criaLinhaColuna(t);
     }
 
@@ -236,7 +311,7 @@ Geral jogo(Tabela t, Soma s, Jogador j, int parametro){
     }
     j.tempoF=time(NULL)-j.tempoI;
     printf("VOCÊ GANHOU!\n");
-    printf("Você terminou o jogo em %d segundos!", j.tempoF);
+    printf("Você terminou o jogo em %d segundos!\n", j.tempoF);
     g.parametro=0;
     return g;
 }
@@ -295,7 +370,7 @@ int ** resolver(Tabela t){
     int n=t.tam;
     for(int i=0; i<n; i++)
         for(int j=0; j<n; j++)
-            t.resposta[i][j]=t.espelho[i][j];
+            t.resposta[i][j]=t.gabarito[i][j];
 
     return t.resposta;
 }
@@ -309,7 +384,7 @@ int ** dica(Tabela t){
         c = rand()%n;
         
         if(t.resposta[l][c]==0){
-            t.resposta[l][c]=t.espelho[l][c];
+            t.resposta[l][c]=t.gabarito[l][c];
             return t.resposta;
         }
         
@@ -323,7 +398,7 @@ int verificaVitoria(Tabela t){
 
     for(int i=0; i<n; i++)
         for(int j=0; j<n; j++)
-            if(t.resposta[i][j]!=t.espelho[i][j])
+            if(t.resposta[i][j]!=t.gabarito[i][j])
                 return 0;
 
 
@@ -405,14 +480,14 @@ int ** criarMatrizEspelho(int n){ //Essa função irá criar uma matriz que poss
     return mat_esp;
 }
 
-Soma criaLinhaColuna(Tabela tab){ //Essa função soma as linhas e colunas baseadas na matriz espelho
+Soma criaLinhaColuna(Tabela tab){ //Essa função soma as linhas e colunas baseadas na matriz gabarito
 
     Soma vet;
     vet.linha=criaVetor(tab.tam);
     vet.coluna=criaVetor(tab.tam);
     for(int i=0; i<tab.tam; i++){
         for(int j=0; j<tab.tam; j++){
-            if(tab.espelho[i][j]==1){
+            if(tab.gabarito[i][j]==1){
                 vet.linha[i]+=tab.mat[i][j];
                 vet.coluna[j]+=tab.mat[i][j];
             }

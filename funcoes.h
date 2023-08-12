@@ -3,6 +3,7 @@
 
 #define M 266
 #define TAM 256
+#define QUANTJOGADOR 5
 
 typedef struct{
     
@@ -14,7 +15,7 @@ typedef struct{
 typedef struct{
 
     int **mat;
-    int **espelho;
+    int **gabarito;
     int **resposta;
 
     int tam;
@@ -35,7 +36,14 @@ typedef struct{
     int tempoF;
     int tempoI;
     int TempoT;
+    
 }Jogador;
+
+typedef struct{
+
+    char **nome;
+    int **tempo;
+}Ranking;
 
 typedef struct{
 
@@ -115,6 +123,8 @@ Soma criaLinhaColuna(Tabela tab);
 
 Geral jogo(Tabela t, Soma s, Jogador j, int parametro);
 Geral abreArquivo(char * nome_arq);
+
+Ranking abreArquivo(Ranking r);
 int verificaVitoria(Tabela t);
 
 int * criaVetor(int n);
