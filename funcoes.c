@@ -16,7 +16,7 @@ void opcoes(){
     do{
         printf("Bem vindo ao Jogo SUMPLETE!\n");
 
-        printf("0. Sair do Jogo\n");
+        printf("0. Sair do Jogo!!!\n");
         printf("1. Começar um novo jogo\n");
         printf("2. Continuar um jogo salvo em arquivo\n");
         printf("3. Continuar o jogo atual\n");
