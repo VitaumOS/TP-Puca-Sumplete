@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"name": "TP",
+			"path": "."
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"funcoes.h": "c",
+			"stdlib.h": "c"
+		}
+	}
+}
