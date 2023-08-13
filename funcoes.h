@@ -22,7 +22,7 @@ typedef struct{
     int quant_manter;
     int quant_remover;
 
-    char tam_c[2];
+    char tam_c;
     char dificuldade;
 
     char opcao[M];

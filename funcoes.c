@@ -43,16 +43,24 @@ void opcoes(){
                 j.nome[j.tam_nome-1]='\0';
                 system("clear");
 
-                printf("%s, Digite a dimensão que deseja (de 3 a 9): ", j.nome);
-                scanf(" %s", t.tam_c);
-                limparBuffer();
-                system("clear");
+                do{
 
-                printf("Agora, digite a dificuldade:\nFácil - F\nMédio - M\nDifícil - D:\nDigite a dificuldade desejada: ");
-                scanf(" %c", &t.dificuldade);
-                limparBuffer();
-                system("clear");
-                
+                    printf("%s, Digite a dimensão que deseja (de 3 a 9): ", j.nome);
+                    scanf(" %c", &t.tam_c);
+                    t.tam=t.tam_c-'0';
+                    limparBuffer();
+                    system("clear");
+                    if(t.tam<3 || t.tam>9)
+                        printf("Valor inválido!\n"); 
+                }while(t.tam<3 || t.tam>9);
+                do{
+                    printf("Agora, digite a dificuldade:| Fácil - F | Médio - M | Difícil - D |: ");
+                    scanf(" %c", &t.dificuldade);
+                    limparBuffer();
+                    system("clear");
+                    if(t.dificuldade!='F' && t.dificuldade!='M' && t.dificuldade!='D')
+                        printf("Valor inválido!\n");
+                }while(t.dificuldade!='F' && t.dificuldade!='M' && t.dificuldade!='D');
                 g=jogo(t, s,j,0);
 
                 break;
@@ -307,7 +315,6 @@ Geral jogo(Tabela t, Soma s, Jogador j, int parametro){
         t.quant_manter=0;
         t.quant_remover=0;
 
-        t.tam = atoi(t.tam_c);
         t.mat=criaMatriz(t.tam);
         t.resposta=criaMatriz(t.tam);
         t.mat=geravalores(t.mat, t.tam);
