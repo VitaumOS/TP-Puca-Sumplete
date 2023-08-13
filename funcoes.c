@@ -107,7 +107,7 @@ void guardaRanking(Geral g){
         if(ranking.tempo[i][0]!=0){
             printf("Size = %d\n", i);
             for(int j=0; j<5; j++){
-                if(ranking.tempo[i][0]!=0){
+                if(ranking.tempo[i][j]!=0){
                     printf("Player%d = %s\n", j+1, ranking.nome[i][j]);
                     printf("time%d = %d\n", j+1, ranking.tempo[i][j]);
                 }
@@ -131,7 +131,7 @@ Ranking armazenaRanking(Ranking r){
         primeiraPalavra=dividePalavra(linha);
 
         if(!strcmp(primeiraPalavra, "size")){
-            n=linha[7]-'0';
+            
             do{
                 i++;
                 aux=0;
