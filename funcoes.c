@@ -72,7 +72,7 @@ void opcoes(){
                     printf("Você não começou um jogo!\n");
                 break;
             case '4':
-                guardaRanking(g.j.nome,g.j.tempoF,g.t.tam,0);
+                ranking(g.j.nome,g.j.tempoF,g.t.tam,0);
 
                 break;
             default:
@@ -143,7 +143,7 @@ void mostraRanking(Ranking r){
 
 }
 
-void guardaRanking(char * nome,int tempo, int n, int param){
+void ranking(char * nome,int tempo, int n, int param){
 
     Ranking ranking;
 
@@ -365,7 +365,7 @@ Geral jogo(Tabela t, Soma s, Jogador j, int parametro){
     j.tempoF=time(NULL)-j.tempoI;
     printf("VOCÊ GANHOU!\n");
     printf("Você terminou o jogo em %d segundos!\n", j.tempoF);
-    guardaRanking(j.nome,j.tempoF,t.tam, 1);
+    ranking(j.nome,j.tempoF,t.tam, 1);
     g.parametro=0;
     return g;
 }

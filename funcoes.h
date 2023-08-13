@@ -118,7 +118,7 @@ void opcoes();
 void limpamatriz(int **mat, int n);
 void montarTab(Tabela t, Soma vet);
 void limpavetor(int *vet);
-void guardaRanking(char *nome,int tempo, int n, int param);
+void ranking(char *nome,int tempo, int n, int param);
 void mostraRanking(Ranking r);
 
 Soma criaLinhaColuna(Tabela tab);
