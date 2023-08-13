@@ -118,7 +118,8 @@ void opcoes();
 void limpamatriz(int **mat, int n);
 void montarTab(Tabela t, Soma vet);
 void limpavetor(int *vet);
-void guardaRanking(Geral g);
+void guardaRanking(char *nome,int tempo, int n, int param);
+void mostraRanking(Ranking r);
 
 Soma criaLinhaColuna(Tabela tab);
 
@@ -126,6 +127,9 @@ Geral jogo(Tabela t, Soma s, Jogador j, int parametro);
 Geral abreArquivo(char * nome_arq);
 
 Ranking armazenaRanking(Ranking r);
+Ranking alocaRanking(Ranking r);
+Ranking adicionaNovoRanking(char *nome,int tempo, int n, Ranking r);
+
 int verificaVitoria(Tabela t);
 
 char * dividePalavra(char *op);

@@ -72,8 +72,7 @@ void opcoes(){
                     printf("Você não começou um jogo!\n");
                 break;
             case '4':
-
-                guardaRanking(g);
+                guardaRanking(g.j.nome,g.j.tempoF,g.t.tam,0);
 
                 break;
             default:
@@ -89,34 +88,74 @@ void limparBuffer() {
     while ((c = getchar()) != '\n' && c != EOF);
 }
 
-void guardaRanking(Geral g){
+Ranking alocaRanking(Ranking r){
 
-    Ranking ranking;
-
-    ranking.nome=malloc(9*sizeof(char**));
-    ranking.tempo=calloc(9,sizeof(int*));
+    r.tempo=calloc(9,sizeof(int*));
+    r.nome=malloc(9*sizeof(char**));
     for(int i=0; i<9;i++){
-        ranking.nome[i]=malloc(QUANTJOGADOR*sizeof(char*));
+        r.nome[i]=malloc(QUANTJOGADOR*sizeof(char*));
+        r.tempo[i]=calloc(QUANTJOGADOR,sizeof(int));
         for(int j=0; j<QUANTJOGADOR; j++)
-            ranking.nome[i][j]=malloc(M*sizeof(char));
-        ranking.tempo[i]=calloc(QUANTJOGADOR,sizeof(int));
+            r.nome[i][j]=malloc(M*sizeof(char));   
     }
 
-    ranking=armazenaRanking(ranking);
+    return r;
+}
+
+Ranking adicionaNovoRanking(char *nome,int tempo, int n, Ranking r){
+
+    int i=0, aux1=tempo, aux2;
+    char c_aux1[M], c_aux2[M];
+    strcpy(c_aux1,nome);
+
+    while(i<QUANTJOGADOR){
+        
+        if(tempo<r.tempo[n][i]){
+            for(int j=i; j<QUANTJOGADOR; j++){
+                aux2=r.tempo[n][j];
+                strcpy(c_aux2,r.nome[n][j]);
+                r.tempo[n][j]=aux1;
+                strcpy(r.nome[n][j],c_aux1);
+                aux1=aux2;
+                strcpy(c_aux1,c_aux2);
+            }
+            i=QUANTJOGADOR;
+        }
+        i++;
+    }
+    return r;
+}
+
+void mostraRanking(Ranking r){
+
     for(int i=0; i<9; i++){
-        if(ranking.tempo[i][0]!=0){
+        if(r.tempo[i][0]!=0){
             printf("Size = %d\n", i);
-            for(int j=0; j<5; j++){
-                if(ranking.tempo[i][j]!=0){
-                    printf("Player%d = %s\n", j+1, ranking.nome[i][j]);
-                    printf("time%d = %d\n", j+1, ranking.tempo[i][j]);
+            for(int j=0; j<QUANTJOGADOR; j++){
+                if(r.tempo[i][j]!=0){
+                    printf("Player%d = %s\n", j+1, r.nome[i][j]);
+                    printf("time%d = %d\n", j+1, r.tempo[i][j]);
                 }
             }
             printf("\n");
         }
     }
 
+}
 
+void guardaRanking(char * nome,int tempo, int n, int param){
+
+    Ranking ranking;
+
+    ranking=alocaRanking(ranking);
+    ranking=armazenaRanking(ranking);
+
+    if(param){
+        ranking=adicionaNovoRanking(nome,tempo,n,ranking);
+        mostraRanking(ranking);
+    }
+    else
+        mostraRanking(ranking);
 }
 
 Ranking armazenaRanking(Ranking r){
@@ -131,7 +170,7 @@ Ranking armazenaRanking(Ranking r){
         primeiraPalavra=dividePalavra(linha);
 
         if(!strcmp(primeiraPalavra, "size")){
-            
+            n=linha[7]-'0';
             do{
                 i++;
                 aux=0;
@@ -167,11 +206,9 @@ Ranking armazenaRanking(Ranking r){
                             numero[1]='\0';
                             r.tempo[n][i]+=atoi(numero)*pow(10,aux);
                             
-                        }
-                        
+                        } 
                     }
                 }
-
             }while(r.tempo[n][i]!=0);
         }   
     }
@@ -328,6 +365,7 @@ Geral jogo(Tabela t, Soma s, Jogador j, int parametro){
     j.tempoF=time(NULL)-j.tempoI;
     printf("VOCÊ GANHOU!\n");
     printf("Você terminou o jogo em %d segundos!\n", j.tempoF);
+    guardaRanking(j.nome,j.tempoF,t.tam, 1);
     g.parametro=0;
     return g;
 }
