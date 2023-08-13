@@ -105,11 +105,11 @@ void guardaRanking(Geral g){
     ranking=armazenaRanking(ranking);
     for(int i=0; i<9; i++){
         if(ranking.tempo[i][0]!=0){
-            printf("Size = %d\n", i+1);
+            printf("Size = %d\n", i);
             for(int j=0; j<5; j++){
                 if(ranking.tempo[i][0]!=0){
-                    printf("Player%d = %s\n", i+1, ranking.nome[i][j]);
-                    printf("time%d = %d\n", i+1, ranking.tempo[i][j]);
+                    printf("Player%d = %s\n", j+1, ranking.nome[i][j]);
+                    printf("time%d = %d\n", j+1, ranking.tempo[i][j]);
                 }
             }
             printf("\n");
@@ -122,7 +122,7 @@ void guardaRanking(Geral g){
 Ranking armazenaRanking(Ranking r){
 
     FILE *arq=fopen("sumplete.ini", "r");
-    char linha[M], *primeiraPalavra, nome[TAM];
+    char linha[M], *primeiraPalavra, nome[M];
     int n,tam, tam_total, aux, i;
 
     while(!feof(arq)){
@@ -131,48 +131,46 @@ Ranking armazenaRanking(Ranking r){
         primeiraPalavra=dividePalavra(linha);
 
         if(!strcmp(primeiraPalavra, "size")){
-            n=linha[7];
+            n=linha[7]-'0';
             do{
                 i++;
                 aux=0;
-                fgets(linha, M, arq);
-                tam_total=strlen(linha);
-                primeiraPalavra=dividePalavra(linha);
-                tam=strlen(primeiraPalavra);
-                primeiraPalavra[tam-1]='\0';
-                
-                printf("%s ", primeiraPalavra );
-
-                if(!strcmp(primeiraPalavra, "player")){
+                for(int k=0; k<2; k++){
+                    fgets(linha, M, arq);
+                    tam_total=strlen(linha);
+                    primeiraPalavra=dividePalavra(linha);
+                    tam=strlen(primeiraPalavra);
+                    primeiraPalavra[tam-1]='\0';
                     
-                    for(int j=tam+4; j<tam_total-1; j++){
-                        nome[aux]=primeiraPalavra[j];
-                        aux++;
-                    }
-                    nome[aux]='\0';
-                    strcpy(nome,r.nome[n][i]);  
-                    printf("Teste\n"); 
+                    if(!strcmp(primeiraPalavra, "player")){
+                        
+                        for(int j=tam+3; j<tam_total-1; j++){
+                            nome[aux]=linha[j];
+                            aux++;
+                        }
+                        nome[aux]='\0';
+                        strcpy(r.nome[n][i],nome);  
 
+                    }
+
+                    else if(!strcmp(primeiraPalavra, "time")){
+                        
+                        for(int j=tam+3; j<tam_total-1; j++){
+                            nome[aux]=linha[j];
+                            aux++;
+                        }
+                        char numero[2];
+                        int aux2=aux;
+                        for(int j=0; j<=aux2; j++){
+                            aux--;
+                            numero[0]=nome[j];
+                            numero[1]='\0';
+                            r.tempo[n][i]+=atoi(numero)*pow(10,aux);
+                            
+                        }
+                        
+                    }
                 }
-
-                else if(!strcmp(primeiraPalavra, "time")){
-                    
-                    for(int j=tam+4; j<tam_total-1; j++){
-                        nome[aux]=linha[j];
-                        aux++;
-                    }
-                    char numero[2];
-                    int aux2=aux;
-                    for(int j=0; j<=aux2; j++){
-                        numero[0]=nome[j];
-                        numero[1]='\0';
-                        r.tempo[n][i]+=atoi(numero)*pow(10,aux);
-                        aux--;
-                    }
-                    
-                }
-
-                printf("Nome = %s\nTempo = %d",r.nome[n][i],r.tempo[n][i] );
 
             }while(r.tempo[n][i]!=0);
         }   
