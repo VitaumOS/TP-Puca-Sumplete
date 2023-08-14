@@ -1,9 +1,17 @@
 #ifndef FUNCOES_H
 #define FUNCOES_H
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <math.h>
+#include <time.h>
+
 #define M 266
 #define TAM 256
 #define QUANTJOGADOR 5
+#define QUANTDIMENSOES 10
+#define TAM_COMANDO 12
 
 typedef struct{
     
@@ -41,8 +49,8 @@ typedef struct{
 
 typedef struct{
 
-    char ***nome;
-    int **tempo;
+    char nome[QUANTDIMENSOES][QUANTJOGADOR][M];
+    int tempo[QUANTDIMENSOES][QUANTJOGADOR];
 }Ranking;
 
 typedef struct{
@@ -53,8 +61,6 @@ typedef struct{
 
     int parametro;
 }Geral;
-
-
 
 
 // cores e formato de texto
@@ -111,7 +117,7 @@ typedef struct{
 #define TAB_MR  "\u252B" // ┫ (middle-right)
 #define TAB_BR  "\u251B" // ┛ (bottom-right)
  
-
+void atualizaRanking(Ranking r);
 void salvaArquivo(int l, Tabela t, Soma s, Jogador j);
 void limparBuffer();
 void opcoes();
@@ -120,6 +126,7 @@ void montarTab(Tabela t, Soma vet);
 void limpavetor(int *vet);
 void ranking(char *nome,int tempo, int n, int param);
 void mostraRanking(Ranking r);
+void limpachar(char *op);
 
 Soma criaLinhaColuna(Tabela tab);
 
@@ -132,7 +139,7 @@ Ranking adicionaNovoRanking(char *nome,int tempo, int n, Ranking r);
 
 int verificaVitoria(Tabela t);
 
-char * dividePalavra(char *op);
+char   dividePalavra(char *op);
 
 int * criaVetor(int n);
 
@@ -142,7 +149,5 @@ int ** criaMatriz(int n);
 int ** criarMatrizEspelho(int n);
 int ** resolver(Tabela t);
 int ** dica(Tabela t);
-
-
 
 #endif
