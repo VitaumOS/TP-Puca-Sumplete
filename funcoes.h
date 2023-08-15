@@ -121,9 +121,9 @@ void atualizaRanking(Ranking r);
 void salvaArquivo(int l, Tabela t, Soma s, Jogador j);
 void limparBuffer();
 void opcoes();
-void limpamatriz(int **mat, int n);
+void limpamatriz(int ***mat, int n);
 void montarTab(Tabela t, Soma vet);
-void limpavetor(int *vet);
+void limpavetor(int **vet);
 void ranking(char *nome,int tempo, int n, int param);
 void mostraRanking(Ranking r);
 void limpachar(char *op);
@@ -139,7 +139,7 @@ Ranking adicionaNovoRanking(char *nome,int tempo, int n, Ranking r);
 
 int verificaVitoria(Tabela t);
 
-char   dividePalavra(char *op);
+void dividePalavra(char *op, char **opcao);
 
 int * criaVetor(int n);
 

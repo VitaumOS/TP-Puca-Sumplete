@@ -34,7 +34,7 @@ void opcoes(){
 
             case '0': 
 
-                if(g.parametro==1)
+                if(g.parametro==2)
                     ranking(g.j.nome,g.j.tempoF,g.t.tam, 1);
                 break;
             case '1': 
@@ -97,7 +97,7 @@ Geral jogo(Tabela t, Soma s, Jogador j, int parametro){
 
     int vitoria=0;
     int r, len;
-    char opcao[TAM_COMANDO];
+    char *opcao;
 
     Geral g;
     if(parametro==0){
@@ -121,7 +121,7 @@ Geral jogo(Tabela t, Soma s, Jogador j, int parametro){
 
         system("clear");
 
-        strcpy(opcao,dividePalavra(t.opcao));
+        dividePalavra(t.opcao, &opcao);
         len=strlen(opcao);
 
         if(!strcmp(opcao, "manter") ){
@@ -150,6 +150,7 @@ Geral jogo(Tabela t, Soma s, Jogador j, int parametro){
             g.s=s;
             g.parametro=1;
             g.j.tempoF=time(NULL)-j.tempoI;
+
             return g;
         }
         else{
@@ -157,14 +158,23 @@ Geral jogo(Tabela t, Soma s, Jogador j, int parametro){
         }
 
         vitoria=verificaVitoria(t);
-        limpachar(opcao);
+        free(opcao);
 
     }
     j.tempoF=time(NULL)-j.tempoI;
     printf("VOCÊ GANHOU!\n");
     printf("Você terminou o jogo em %d segundos!\n", j.tempoF);
+    g.t.tam=t.tam;
+    g.j.tempoF=j.tempoF;
+    strcpy(g.j.nome,j.nome);
+    g.parametro=2;
+    limpamatriz(&t.mat, t.tam);
+    limpamatriz(&t.resposta, t.tam);
+    limpamatriz(&t.gabarito, t.tam);
+    limpavetor(&s.linha);
+    limpavetor(&s.coluna);
+
     
-    g.parametro=0;
     return g;
 }
 
@@ -364,69 +374,58 @@ void ranking(char * nome,int tempo, int n, int param){
 
     if(param){
         ranking=adicionaNovoRanking(nome,tempo,n,ranking);
-        
+        mostraRanking(ranking);
         atualizaRanking(ranking);
     }
     else
         mostraRanking(ranking);
 }
 
-Ranking armazenaRanking(Ranking r){
+Ranking armazenaRanking(Ranking r) {
+    FILE *arq = fopen("sumplete.ini", "r");
+    char linha[M], *opcao, *opcao2, nome[M], numero[2];
+    int n, tam, tam_total, aux, i;
 
-    FILE *arq=fopen("sumplete.ini", "r");
-    char linha[M], primeiraPalavra[TAM_COMANDO], nome[M];
-    int n,tam, tam_total, aux, i;
-
-    while(!feof(arq)){
-        i=-1;
+    while (!feof(arq)) {
+        i = -1;
         fgets(linha, M, arq);
-        strcpy(primeiraPalavra,dividePalavra(linha));
+        dividePalavra(linha, &opcao);
 
-        if(!strcmp(primeiraPalavra, "size")){
-            n=linha[7]-'0';
+        if (!strcmp(opcao, "size")) {
+            n = linha[7] - '0';
+            free(opcao);
 
-
-            do{
+            do {
                 i++;
-                aux=0;
-                for(int k=0; k<2; k++){
+                aux = 0;
+                for (int k = 0; k < 2; k++) {
                     fgets(linha, M, arq);
-                    tam_total=strlen(linha);
-                    strcpy(primeiraPalavra,dividePalavra(linha));
-                    tam=strlen(primeiraPalavra);
-                    primeiraPalavra[tam-1]='\0';
-                    
-                    if(!strcmp(primeiraPalavra, "player")){
-                        
-                        for(int j=tam+3; j<tam_total-1; j++){
-                            nome[aux]=linha[j];
+                    tam_total = strlen(linha);
+                    dividePalavra(linha, &opcao2);
+
+                    tam = strlen(opcao2);
+                    opcao2[tam - 1] = '\0';
+
+                    if (!strcmp(opcao2, "player")) {
+                        for (int j = tam + 3; j < tam_total - 1; j++) {
+                            nome[aux] = linha[j];
                             aux++;
                         }
-                        nome[aux]='\0';
-                        strcpy(r.nome[n][i],nome);  
-
-                    }
-
-                    else if(!strcmp(primeiraPalavra, "time")){
-                        
-                        for(int j=tam+3; j<tam_total-1; j++){
-                            nome[aux]=linha[j];
-                            aux++;
+                        nome[aux] = '\0';
+                        strcpy(r.nome[n][i], nome);
+                    } 
+                    else if (!strcmp(opcao2, "time")) {
+                        aux = 0;
+                        for (int j = tam + 3; j < tam_total - 1; j++) {
+                            numero[0] = linha[j];
+                            numero[1] = '\0';
+                            r.tempo[n][i] = r.tempo[n][i] * 10 + atoi(numero);
                         }
-                        char numero[2];
-                        int aux2=aux;
-                        for(int j=0; j<=aux2; j++){
-                            aux--;
-                            numero[0]=nome[j];
-                            numero[1]='\0';
-                            r.tempo[n][i]+=atoi(numero)*pow(10,aux);
-                            
-                        } 
                     }
-            
+                    free(opcao2);
                 }
-            }while(r.tempo[n][i]!=0);
-        }   
+            } while (r.tempo[n][i] != 0);
+        }
     }
     fclose(arq);
     return r;
@@ -531,10 +530,10 @@ Geral abreArquivo(char * nome_arq){
     fscanf(arq,"%d", &g.j.TempoT);
 
     fclose(arq);
-    limpamatriz(g.t.mat,g.t.tam);
-    limpamatriz(g.t.resposta,g.t.tam);
-    limpavetor(g.s.linha);
-    limpavetor(g.s.coluna);
+    limpamatriz(&g.t.mat,g.t.tam);
+    limpamatriz(&g.t.resposta,g.t.tam);
+    limpavetor(&g.s.linha);
+    limpavetor(&g.s.coluna);
     return g;
 
 }
@@ -594,18 +593,19 @@ void limparBuffer() {
     while ((c = getchar()) != '\n' && c != EOF);
 }
 
-char  dividePalavra(char *op){
-    int i=0;
-    char opcao[12];
-    
-    while(op[i]!=' ' && op[i]!='\n'){
+void dividePalavra(char *op, char **opcao) {
+    int i = 0;
+
+    while (op[i] != ' ' && op[i] != '\n') {
         i++;
     }
-    for(int j=0; j<i; j++)
-        opcao[j]=op[j];
+    *opcao = malloc((i + 1) * sizeof(char));
+    for (int j = 0; j < i; j++)
+        (*opcao)[j] = op[j];
 
-    opcao[i]='\0';
-    return opcao;
+    (*opcao)[i] = '\0';
+    // Liberar memória alocada para *opcao
+
 }
 
 
@@ -631,16 +631,16 @@ int * criaVetor(int n){ //Essa função cria um vetor
 }
 
 
-void limpamatriz(int **mat, int n){ //Essa função limpa a matriz alocada dinamicamente
+void limpamatriz(int ***mat, int n){ //Essa função limpa a matriz alocada dinamicamente
 
     for(int i=0; i<n; i++)
-        free(mat[i]);
-    free(mat);
+        free((*mat)[i]);
+    free(*mat);
 }
 
-void limpavetor(int *vet){ //Essa função limpa o vetor alocado dinamicamente
+void limpavetor(int **vet){ //Essa função limpa o vetor alocado dinamicamente
 
-    free(vet);
+    free(*vet);
 }
 
 void limpachar(char *op){
