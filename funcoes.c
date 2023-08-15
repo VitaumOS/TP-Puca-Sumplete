@@ -125,11 +125,11 @@ Geral jogo(Tabela t, Soma s, Jogador j, int parametro){
         len=strlen(opcao);
 
         if(!strcmp(opcao, "manter") ){
-            t.resposta=resposta(len, t.opcao, t.resposta,1);
+            t.resposta=resposta(len, t.opcao, t.resposta,t.tam,1);
             t.quant_manter++;
         }
         else if(!strcmp(opcao,"remover") ){
-            t.resposta=resposta(len, t.opcao, t.resposta,2);
+            t.resposta=resposta(len, t.opcao, t.resposta,t.tam,2);
             t.quant_remover++;
         }
         else if(!strcmp(opcao,"dica")){
@@ -341,7 +341,7 @@ void montarTab(Tabela t, Soma vet){ //Essa função monta a tabela do jogo com o
     
 }
 
-int ** resposta(int l, char *op, int** resposta, int n){
+int ** resposta(int l, char *op, int** resposta, int tam,int n){
 
     int linha, coluna;
     char lin[2], col[2];
@@ -353,10 +353,15 @@ int ** resposta(int l, char *op, int** resposta, int n){
     col[0]=op[l+2];
     col[1]='\0';
 
-    linha=atoi(lin);
-    coluna=atoi(col);
+    linha=atoi(lin)-1;
+    coluna=atoi(col)-1;
 
-    resposta[linha-1][coluna-1]=n;
+    if(linha>=tam || linha<0 || coluna>=tam || coluna<0){
+        n=0;
+        printf("Valores de linha ou coluna inválido!\n");
+    }
+    else
+        resposta[linha][coluna]=n;
 
     return resposta;
 }
@@ -374,7 +379,6 @@ void ranking(char * nome,int tempo, int n, int param){
 
     if(param){
         ranking=adicionaNovoRanking(nome,tempo,n,ranking);
-        mostraRanking(ranking);
         atualizaRanking(ranking);
     }
     else
@@ -397,8 +401,8 @@ Ranking armazenaRanking(Ranking r) {
 
             do {
                 i++;
-                aux = 0;
                 for (int k = 0; k < 2; k++) {
+                    aux = 0;
                     fgets(linha, M, arq);
                     tam_total = strlen(linha);
                     dividePalavra(linha, &opcao2);
@@ -407,6 +411,7 @@ Ranking armazenaRanking(Ranking r) {
                     opcao2[tam - 1] = '\0';
 
                     if (!strcmp(opcao2, "player")) {
+
                         for (int j = tam + 3; j < tam_total - 1; j++) {
                             nome[aux] = linha[j];
                             aux++;
@@ -415,7 +420,7 @@ Ranking armazenaRanking(Ranking r) {
                         strcpy(r.nome[n][i], nome);
                     } 
                     else if (!strcmp(opcao2, "time")) {
-                        aux = 0;
+                        
                         for (int j = tam + 3; j < tam_total - 1; j++) {
                             numero[0] = linha[j];
                             numero[1] = '\0';
@@ -439,7 +444,7 @@ Ranking adicionaNovoRanking(char *nome,int tempo, int n, Ranking r){
 
     while(i<QUANTJOGADOR){
         
-        if(tempo<r.tempo[n][i] && r.tempo[n][i]!=0){
+        if(tempo<r.tempo[n][i] || r.tempo[n][0]==0){
             for(int j=i; j<QUANTJOGADOR; j++){
                 aux2=r.tempo[n][j];
                 strcpy(c_aux2,r.nome[n][j]);
@@ -604,10 +609,8 @@ void dividePalavra(char *op, char **opcao) {
         (*opcao)[j] = op[j];
 
     (*opcao)[i] = '\0';
-    // Liberar memória alocada para *opcao
 
 }
-
 
 int ** criaMatriz(int n){ //Essa função cria uma matriz
 

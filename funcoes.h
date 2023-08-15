@@ -143,7 +143,7 @@ void dividePalavra(char *op, char **opcao);
 
 int * criaVetor(int n);
 
-int ** resposta(int l, char *op, int** resposta, int n);
+int ** resposta(int l, char *op, int** resposta, int tam, int n);
 int ** geravalores(int **mat, int n);
 int ** criaMatriz(int n);
 int ** criarMatrizEspelho(int n);
