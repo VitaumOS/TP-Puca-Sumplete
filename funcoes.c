@@ -55,14 +55,19 @@ void opcoes(){
                     if(t.tam<3 || t.tam>9)
                         printf("Valor inválido!\n"); 
                 }while(t.tam<3 || t.tam>9);
-                do{
-                    printf("Agora, digite a dificuldade:| Fácil - F | Médio - M | Difícil - D |: ");
-                    scanf(" %c", &t.dificuldade);
-                    limparBuffer();
-                    system("clear");
-                    if(t.dificuldade!='F' && t.dificuldade!='M' && t.dificuldade!='D')
-                        printf("Valor inválido!\n");
-                }while(t.dificuldade!='F' && t.dificuldade!='M' && t.dificuldade!='D');
+                if(t.tam>=5){
+                    do{
+                        printf("Agora, digite a dificuldade:| Fácil - F | Médio - M | Difícil - D |: ");
+                        scanf(" %c", &t.dificuldade);
+                        limparBuffer();
+                        system("clear");
+                        if(t.dificuldade!='F' && t.dificuldade!='M' && t.dificuldade!='D')
+                            printf("Valor inválido!\n");
+                    }while(t.dificuldade!='F' && t.dificuldade!='M' && t.dificuldade!='D');
+                }
+                else
+                    t.dificuldade='F';
+                
                 g=jogo(t, s,j,0);
 
                 break;
@@ -127,7 +132,7 @@ Geral jogo(Tabela t, Soma s, Jogador j, int parametro){
 
         t.mat=criaMatriz(t.tam);
         t.resposta=criaMatriz(t.tam);
-        t.mat=geravalores(t.mat, t.tam);
+        t.mat=geravalores(t.mat, t.tam, t.dificuldade);
         t.gabarito=criarMatrizEspelho(t.tam);
         s=criaLinhaColuna(t);
     }
@@ -238,13 +243,21 @@ int verificaVitoria(Tabela t){ //Essa função irá comparar os valores colocado
 
 }
 
-int ** geravalores(int **mat, int n){ //Essa função gera os valores aleatoriamente da matriz (AINDA PRECISA SER ALTERADA PARA AS DIFICULDADES)
+int ** geravalores(int **mat, int n, char d){ //Essa função gera os valores aleatoriamente da matriz 
 
-    int m;
+    int m, quantnum, intervalo;
+    if(d=='F' || d=='M'){
+        quantnum=9;
+        intervalo=1;
+    }
+    else{
+        quantnum=19;
+        intervalo=-9;
+    }
     for(int i=0; i<n; i++){
         for(int j=0; j<n; j++){
 
-            m=rand()%9+1;
+            m=rand()%quantnum+intervalo;
             mat[i][j]=m; 
         }
     }
