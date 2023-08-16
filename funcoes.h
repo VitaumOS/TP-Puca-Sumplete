@@ -130,27 +130,28 @@ void limpavetor(int **vet);
 void ranking(char *nome,int tempo, int n, int param);
 void mostraRanking(Ranking r);
 void limpachar(char *op);
+void dividePalavra(char *op, char **opcao);
+
+Tabela criarMatrizEspelho(Tabela t);
 
 Soma criaLinhaColuna(Tabela tab);
+
+Ranking armazenaRanking(Ranking r);
+Ranking adicionaNovoRanking(char *nome,int tempo, int n, Ranking r);
 
 Geral jogo(Tabela t, Soma s, Jogador j, int parametro);
 Geral abreArquivo(char * nome_arq);
 
-Ranking armazenaRanking(Ranking r);
-Ranking alocaRanking(Ranking r);
-Ranking adicionaNovoRanking(char *nome,int tempo, int n, Ranking r);
-
 int verificaVitoria(Tabela t);
 int verificaNomeArquivo(char *arquivo);
 
-void dividePalavra(char *op, char **opcao);
+
 
 int * criaVetor(int n);
 
 int ** resposta(int l, char *op, int** resposta, int tam, int n);
 int ** geravalores(int **mat, int n, char d);
 int ** criaMatriz(int n);
-Tabela criarMatrizEspelho(Tabela t);
 int ** resolver(Tabela t);
 int ** dica(Tabela t);
 
