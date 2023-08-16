@@ -71,7 +71,7 @@ Soma criaLinhaColuna(Tabela tab) {
 }
 
 void gabarito(Tabela t, Soma s){
-    int n=pow(2,t.tam), soma=0, quant;
+    int n=pow(2,t.tam), soma=0, quant,aux;
     
     int *linhaF=malloc(t.tam*sizeof(int));
 
@@ -82,8 +82,8 @@ void gabarito(Tabela t, Soma s){
     int **linha=calloc(n,sizeof(int*));
     for(int i=0; i<n; i++)
         linha[i]=calloc((t.tam+1),sizeof(int));
-    
-    for(int i=0; i<t.tam; i++){
+    do{
+        for(int i=0; i<t.tam; i++){
 
             quant=0;
             for(int k=0; k<n; k++){
@@ -94,6 +94,8 @@ void gabarito(Tabela t, Soma s){
                         soma+=t.mat[i][j];
                         linha[k][j]=1;   
                     }
+                    else
+                        linha[k][j]=2;
                 }
                 for(int j=0; j<t.tam; j++)
                     if(matgab[i][j]!=linha[k][j] && matgab[i][j]!=0)
@@ -107,10 +109,8 @@ void gabarito(Tabela t, Soma s){
                 for(int k=0; k<n; k++){
                     if(linha[k][t.tam]==1){
                         for(int j=0; j<t.tam; j++){
-                            if(linha[k][j]==0)
-                                linhaF[j]=2;
-                            else
-                                linhaF[j]=linha[k][j];
+                         
+                            linhaF[j]=linha[k][j];
                         }
                     }
                     
@@ -131,11 +131,11 @@ void gabarito(Tabela t, Soma s){
                 printf("%d ", linhaF[x]);  
             printf("Possibilidades: %d\n", quant); 
         
-    }
+        }
 
         printf("\n");
 
-    for(int i=0; i<t.tam; i++){
+        for(int i=0; i<t.tam; i++){
 
             quant=0;
             for(int k=0; k<n; k++){
@@ -146,6 +146,8 @@ void gabarito(Tabela t, Soma s){
                         soma+=t.mat[j][i];
                         linha[k][j]=1;
                     }
+                    else
+                        linha[k][j]=2;
                 }
                 for(int j=0; j<t.tam; j++)
                     if(matgab[j][i]!=linha[k][j] && matgab[j][i]!=0)
@@ -159,10 +161,8 @@ void gabarito(Tabela t, Soma s){
                 for(int k=0; k<n; k++){
                     if(linha[k][t.tam]==1){
                         for(int j=0; j<t.tam; j++){
-                            if(linha[k][j]==0)
-                                linhaF[j]=2;
-                            else
-                                linhaF[j]=linha[k][j];
+                            
+                            linhaF[j]=linha[k][j];
                         }
                     }
                     
@@ -182,13 +182,19 @@ void gabarito(Tabela t, Soma s){
                 printf("%d ", linhaF[x]);  
             printf("Possibilidades: %d\n", quant); 
         
-    }
+        }
         printf("\n");
         for(int i=0; i<t.tam; i++){
             for(int j=0; j<t.tam; j++)
                 printf("%d ", matgab[i][j]);
             printf("\n");
         }
+        aux=0;
+        for(int i=0; i<t.tam; i++)
+            for(int j=0; j<t.tam; j++)
+                if(matgab[i][j]!=0)
+                    aux++;
+    }while(aux!=(t.tam*t.tam));
                 
 
     
@@ -206,7 +212,7 @@ int main() {
     Tabela t;
     Soma s;
     
-    t.tam = 4;
+    t.tam = 5;
     t.mat = criarMatriz(t.tam);
     t.resposta = criarMatriz(t.tam);
     t.mat = geraValores(t.mat, t.tam);
