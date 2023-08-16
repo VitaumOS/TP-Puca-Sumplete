@@ -71,7 +71,7 @@ Soma criaLinhaColuna(Tabela tab) {
 }
 
 void gabarito(Tabela t, Soma s){
-    int n=pow(2,t.tam), soma=0, quant,aux;
+    int n=pow(2,t.tam), soma=0, quant,aux,val;
     
     int *linhaF=malloc(t.tam*sizeof(int));
 
@@ -82,8 +82,42 @@ void gabarito(Tabela t, Soma s){
     int **linha=calloc(n,sizeof(int*));
     for(int i=0; i<n; i++)
         linha[i]=calloc((t.tam+1),sizeof(int));
-    do{
-        for(int i=0; i<t.tam; i++){
+
+
+    for(int i=0; i<t.tam; i++){
+        for(int k=0; k<n; k++){
+                for(int j=0; j<t.tam; j++){
+                    if((k>>j)&1){
+                        soma+=t.mat[i][j];
+                        linha[k][j]=1;
+                    }
+                    else
+                        linha[k][j]=2;
+                }
+            }
+            
+        for(int j=0; j<t.tam; j++){
+                aux=0;
+                for(int k=0; k<n; k++){
+                    val=linha[k][0];
+                    if(linha[k][0]!=linha[k][j])
+                        aux++;
+                }
+                if(aux==0){
+            matgab[i][j]=val;
+        } 
+        }
+                   
+    }
+
+    printf("\n\n");
+    for(int i=0; i<t.tam; i++){
+            for(int j=0; j<t.tam; j++)
+                printf("%d ", matgab[i][j]);
+            printf("\n");
+    }
+
+    for(int i=0; i<t.tam; i++){
 
             quant=0;
             for(int k=0; k<n; k++){
@@ -194,7 +228,7 @@ void gabarito(Tabela t, Soma s){
             for(int j=0; j<t.tam; j++)
                 if(matgab[i][j]!=0)
                     aux++;
-    }while(aux!=(t.tam*t.tam));
+
                 
 
     

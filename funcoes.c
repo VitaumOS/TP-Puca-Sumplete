@@ -133,7 +133,7 @@ Geral jogo(Tabela t, Soma s, Jogador j, int parametro){
         t.mat=criaMatriz(t.tam);
         t.resposta=criaMatriz(t.tam);
         t.mat=geravalores(t.mat, t.tam, t.dificuldade);
-        t.gabarito=criarMatrizEspelho(t.tam);
+        t=criarMatrizEspelho(t);
         s=criaLinhaColuna(t);
     }
 
@@ -220,27 +220,34 @@ int ** dica(Tabela t){ // Essa função seleciona um valor aleatório (desde que
         l = rand()%n;
         c = rand()%n;
         
-        if(t.resposta[l][c]==0){
-            t.resposta[l][c]=t.gabarito[l][c];
+        if(t.resposta[l][c]==0 && t.gabarito[l][c]==1){
+            t.resposta[l][c]=1;
             return t.resposta;
         }
         
-    }while(t.resposta[l][c]!=0);
+    }while(t.gabarito[l][c]==2 || t.resposta[l][c]!=0);
 
 }
 
 int verificaVitoria(Tabela t){ //Essa função irá comparar os valores colocados pelo jogador na matriz resposta com a matriz gabarito
 
-    int n=t.tam;
+    int n=t.tam, auxm=0, auxr=0;
 
-    for(int i=0; i<n; i++)
-        for(int j=0; j<n; j++)
-            if(t.resposta[i][j]!=t.gabarito[i][j])
-                return 0;
-
-
-    return 1;
-
+    for(int i=0; i<n; i++){
+        for(int j=0; j<n; j++){
+            if(t.resposta[i][j]==t.gabarito[i][j]){
+                if(t.resposta[i][j]==1)
+                    auxm++;
+                else if(t.resposta[i][j]==2)
+                    auxr++;
+            }
+                 
+        }        
+    }
+    if(auxm==t.quant_manter_total || auxr==t.quant_remover_total)
+        return 1;
+    else
+        return 0;
 }
 
 int ** geravalores(int **mat, int n, char d){ //Essa função gera os valores aleatoriamente da matriz 
@@ -266,24 +273,28 @@ int ** geravalores(int **mat, int n, char d){ //Essa função gera os valores al
 }
 
 
-int ** criarMatrizEspelho(int n){ //Essa função irá criar uma matriz que possuirá os resultados da matriz original
+Tabela criarMatrizEspelho(Tabela t){ //Essa função irá criar uma matriz que possuirá os resultados da matriz original
     
-    int m;
-    int **mat_esp=criaMatriz(n);
+    int m, n=t.tam;
+    t.quant_manter_total=0;
+    t.quant_remover_total=0;
+    t.gabarito=criaMatriz(n);
     for(int i=0; i<n; i++){
         for(int j=0; j<n; j++){
             
             m=rand()%3+1;
 
             if(m!=3){ //Aqui, em 66% das vezes, um valor será escolhido para a soma
-                mat_esp[i][j]=1;
+                t.gabarito[i][j]=1;
+                t.quant_manter_total++;
             }
             else{//Nos outros 33%, o valor nn será escolhido, tendo o valor zero
-                mat_esp[i][j]=2;
+                t.gabarito[i][j]=2;
+                t.quant_remover_total++;
             }
         }
     }
-    return mat_esp;
+    return t;
 }
 
 Soma criaLinhaColuna(Tabela tab){ //Essa função soma as linhas e colunas baseadas na matriz gabarito

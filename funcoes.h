@@ -30,6 +30,9 @@ typedef struct{
     int quant_manter;
     int quant_remover;
 
+    int quant_manter_total;
+    int quant_remover_total;
+
     char tam_c;
     char dificuldade;
 
@@ -147,7 +150,7 @@ int * criaVetor(int n);
 int ** resposta(int l, char *op, int** resposta, int tam, int n);
 int ** geravalores(int **mat, int n, char d);
 int ** criaMatriz(int n);
-int ** criarMatrizEspelho(int n);
+Tabela criarMatrizEspelho(Tabela t);
 int ** resolver(Tabela t);
 int ** dica(Tabela t);
 
