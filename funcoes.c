@@ -198,7 +198,7 @@ Geral jogo(Tabela t, Soma s, Jogador j, int parametro){
     return g;
 }
 
-int ** resolver(Tabela t){
+int ** resolver(Tabela t){ //Essa função copia os valores da matriz gabarito para a matriz resposta
     int n=t.tam;
     for(int i=0; i<n; i++)
         for(int j=0; j<n; j++)
@@ -207,7 +207,7 @@ int ** resolver(Tabela t){
     return t.resposta;
 }
 
-int ** dica(Tabela t){
+int ** dica(Tabela t){ // Essa função seleciona um valor aleatório (desde que não seja um escolhido pelo jogador) e marca na matriz resposta
 
     int n = t.tam,l,c;
 
@@ -224,7 +224,7 @@ int ** dica(Tabela t){
 
 }
 
-int verificaVitoria(Tabela t){
+int verificaVitoria(Tabela t){ //Essa função irá comparar os valores colocados pelo jogador na matriz resposta com a matriz gabarito
 
     int n=t.tam;
 
@@ -388,7 +388,7 @@ int ** resposta(int l, char *op, int** resposta, int tam,int n){
 
 
 
-void ranking(char * nome,int tempo, int n, int param){
+void ranking(char * nome,int tempo, int n, int param){ //Essa é a função geral do Ranking, que controla quando será necessário adicionar um novo jogador ou não
 
     Ranking ranking;
     for(int i=0; i<QUANTDIMENSOES; i++)
@@ -405,7 +405,7 @@ void ranking(char * nome,int tempo, int n, int param){
         mostraRanking(ranking);
 }
 
-Ranking armazenaRanking(Ranking r) {
+Ranking armazenaRanking(Ranking r) {//Essa função armazena os valores dentro do arquivo "sumplete.ini"
     FILE *arq = fopen("sumplete.ini", "r");
     char linha[M], *opcao, *opcao2, nome[M], numero[2];
     int n, tam, tam_total, aux, i;
@@ -456,7 +456,7 @@ Ranking armazenaRanking(Ranking r) {
     return r;
 }
 
-Ranking adicionaNovoRanking(char *nome, int tempo, int n, Ranking r) {
+Ranking adicionaNovoRanking(char *nome, int tempo, int n, Ranking r) {//Essa função pega o novo jogador e seu tempo e o coloca na sua devida posição dentro das variáveis
     int i = 0, aux1 = tempo, aux2;
     char c_aux1[M], c_aux2[M];
     strcpy(c_aux1, nome);
@@ -481,7 +481,7 @@ Ranking adicionaNovoRanking(char *nome, int tempo, int n, Ranking r) {
 }
 
 
-void atualizaRanking(Ranking r){
+void atualizaRanking(Ranking r){ //Essa função atualiza o arquivo "sumplete.ini" quando tem-se um novo jogador
 
     FILE *arq=fopen("sumplete.ini","w");
     for(int i=0; i<QUANTDIMENSOES; i++){
@@ -500,7 +500,7 @@ void atualizaRanking(Ranking r){
     fclose(arq);
 }
 
-void mostraRanking(Ranking r){
+void mostraRanking(Ranking r){ //Essa função pega os valores armazenados do ranking e os mostra em ordem
 
     for(int i=0; i<QUANTDIMENSOES; i++){
         if(r.tempo[i][0]!=0){
@@ -517,7 +517,7 @@ void mostraRanking(Ranking r){
 
 }
 
-Geral abreArquivo(char * nome_arq){
+Geral abreArquivo(char * nome_arq){ //Essa função irá abrir o arquivo de save do jogo e guardá-las nas variáveis
 
     FILE *arq=fopen(nome_arq,"r");
     Geral g;
@@ -621,12 +621,12 @@ void salvaArquivo(int l, Tabela t, Soma s, Jogador j){ //Essa função cria o ar
 
 }
 
-void limparBuffer() {
+void limparBuffer() { //Essa função limpa o buffer
     int c;
     while ((c = getchar()) != '\n' && c != EOF);
 }
 
-void dividePalavra(char *op, char **opcao) {
+void dividePalavra(char *op, char **opcao) {//Essa função irá dividir a primeira palavra de uma frase e retorná-la
     int i = 0;
     while (op[i] != ' ' && op[i] != '\n' && op[i] != '\0') {
         i++;
