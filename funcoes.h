@@ -43,7 +43,7 @@ typedef struct{
     int tam_nome;
     int tempoF;
     int tempoI;
-    int TempoT;
+    int tempoT;
     
 }Jogador;
 
@@ -138,6 +138,7 @@ Ranking alocaRanking(Ranking r);
 Ranking adicionaNovoRanking(char *nome,int tempo, int n, Ranking r);
 
 int verificaVitoria(Tabela t);
+int verificaNomeArquivo(char *arquivo);
 
 void dividePalavra(char *op, char **opcao);
 

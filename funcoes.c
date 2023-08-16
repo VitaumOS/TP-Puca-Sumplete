@@ -70,9 +70,11 @@ void opcoes(){
 
                 printf("Digite o nome do arquivo: ");
                 scanf("%s", nome_arquivo);
-                g=abreArquivo(nome_arquivo);
-                g=jogo(g.t,g.s,g.j,1);
-
+                if(verificaNomeArquivo(nome_arquivo)){
+                    g=abreArquivo(nome_arquivo);
+                    if(g.parametro==1)
+                        g=jogo(g.t,g.s,g.j,1);
+                }
                 break;
             case '3':
 
@@ -93,15 +95,33 @@ void opcoes(){
     }while(opcao!='0');
 }
 
+int verificaNomeArquivo(char *arquivo){
+    int tam,aux=0;
+    char formato[5];
+    tam=strlen(arquivo);
+    for(int i=tam-4; i<=tam; i++){
+        formato[aux]=arquivo[i];
+        aux++;
+    }
+    if(!strcmp(formato, ".txt"))
+        return 1;
+    else{
+        printf("Formato incorreto!\n");
+        return 0;
+    }
+}
+
 Geral jogo(Tabela t, Soma s, Jogador j, int parametro){
 
     int vitoria=0;
     int r, len;
     char *opcao;
+    j.tempoI=time(NULL);
 
     Geral g;
     if(parametro==0){
-        j.tempoI=time(NULL);
+        j.tempoT=0;
+
         t.quant_manter=0;
         t.quant_remover=0;
 
@@ -149,7 +169,7 @@ Geral jogo(Tabela t, Soma s, Jogador j, int parametro){
             g.j=j;
             g.s=s;
             g.parametro=1;
-            g.j.tempoF=time(NULL)-j.tempoI;
+            g.j.tempoT=(time(NULL)-j.tempoI)+j.tempoT;
 
             return g;
         }
@@ -161,7 +181,7 @@ Geral jogo(Tabela t, Soma s, Jogador j, int parametro){
         free(opcao);
 
     }
-    j.tempoF=time(NULL)-j.tempoI;
+    j.tempoF=(time(NULL)-j.tempoI)+j.tempoT;
     printf("VOCÊ GANHOU!\n");
     printf("Você terminou o jogo em %d segundos!\n", j.tempoF);
     g.t.tam=t.tam;
@@ -436,29 +456,30 @@ Ranking armazenaRanking(Ranking r) {
     return r;
 }
 
-Ranking adicionaNovoRanking(char *nome,int tempo, int n, Ranking r){
-
-    int i=0, aux1=tempo, aux2;
+Ranking adicionaNovoRanking(char *nome, int tempo, int n, Ranking r) {
+    int i = 0, aux1 = tempo, aux2;
     char c_aux1[M], c_aux2[M];
-    strcpy(c_aux1,nome);
+    strcpy(c_aux1, nome);
 
-    while(i<QUANTJOGADOR){
-        
-        if(tempo<r.tempo[n][i] || r.tempo[n][0]==0){
-            for(int j=i; j<QUANTJOGADOR; j++){
-                aux2=r.tempo[n][j];
-                strcpy(c_aux2,r.nome[n][j]);
-                r.tempo[n][j]=aux1;
-                strcpy(r.nome[n][j],c_aux1);
-                aux1=aux2;
-                strcpy(c_aux1,c_aux2);
+    while (i < QUANTJOGADOR) {
+        if (tempo < r.tempo[n][i] || r.tempo[n][0] == 0) {
+            for(int j=i; j<QUANTJOGADOR; j++) {
+                aux2 = r.tempo[n][j];
+                strcpy(c_aux2, r.nome[n][j]);
+
+                r.tempo[n][j] = aux1;
+                strcpy(r.nome[n][j], c_aux1);
+
+                aux1 = aux2;
+                strcpy(c_aux1, c_aux2);
             }
-            i=QUANTJOGADOR;
+            break; 
         }
         i++;
     }
     return r;
 }
+
 
 void atualizaRanking(Ranking r){
 
@@ -483,11 +504,11 @@ void mostraRanking(Ranking r){
 
     for(int i=0; i<QUANTDIMENSOES; i++){
         if(r.tempo[i][0]!=0){
-            printf("Size = %d\n", i);
+            printf("Tamanho do Tabuleiro | %d\n", i);
             for(int j=0; j<QUANTJOGADOR; j++){
                 if(r.tempo[i][j]!=0){
-                    printf("Player%d = %s\n", j+1, r.nome[i][j]);
-                    printf("time%d = %d\n", j+1, r.tempo[i][j]);
+                    printf("%d° Lugar - %s\n", j+1, r.nome[i][j]);
+                    printf("Tempo - %d\n", r.tempo[i][j]);
                 }
             }
             printf("\n");
@@ -500,6 +521,12 @@ Geral abreArquivo(char * nome_arq){
 
     FILE *arq=fopen(nome_arq,"r");
     Geral g;
+    if(arq==NULL){
+        printf("Erro ao abrir o arquivo\n");
+        g.parametro=0;
+        return g;
+    }
+    
     fscanf(arq,"%d", &g.t.tam);
     int n=g.t.tam;
     g.t.mat=criaMatriz(g.t.tam);
@@ -532,9 +559,10 @@ Geral abreArquivo(char * nome_arq){
         g.t.resposta[l-1][c-1]=2;
     }
     fgets(g.j.nome,sizeof(g.j.nome),arq);
-    fscanf(arq,"%d", &g.j.TempoT);
+    fscanf(arq,"%d", &g.j.tempoT);
 
     fclose(arq);
+    g.parametro=1;
     limpamatriz(&g.t.mat,g.t.tam);
     limpamatriz(&g.t.resposta,g.t.tam);
     limpavetor(&g.s.linha);
@@ -600,16 +628,13 @@ void limparBuffer() {
 
 void dividePalavra(char *op, char **opcao) {
     int i = 0;
-
-    while (op[i] != ' ' && op[i] != '\n') {
+    while (op[i] != ' ' && op[i] != '\n' && op[i] != '\0') {
         i++;
     }
-    *opcao = malloc((i + 1) * sizeof(char));
+    *opcao = malloc((i+1) * sizeof(char));
     for (int j = 0; j < i; j++)
         (*opcao)[j] = op[j];
-
     (*opcao)[i] = '\0';
-
 }
 
 int ** criaMatriz(int n){ //Essa função cria uma matriz

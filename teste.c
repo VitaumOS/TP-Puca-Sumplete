@@ -81,9 +81,7 @@ void gabarito(Tabela t, Soma s){
             for(int j=0; j<t.tam; j++){
                 if((i>>j)&1){
                     soma+=t.mat[0][j];
-                    
                     linha[i][j]=1;
-
                 }
             }
             if(soma==s.linha[0])
