@@ -86,26 +86,36 @@ void gabarito(Tabela t, Soma s){
 
     for(int i=0; i<t.tam; i++){
         for(int k=0; k<n; k++){
-                for(int j=0; j<t.tam; j++){
-                    if((k>>j)&1){
-                        soma+=t.mat[i][j];
-                        linha[k][j]=1;
-                    }
-                    else
-                        linha[k][j]=2;
+            soma=0;
+            for(int j=0; j<t.tam; j++){
+                if((k>>j)&1){
+                    soma+=t.mat[i][j];
+                    linha[k][j]=1;
+                }
+                else
+                    linha[k][j]=2;
+            }
+            if(soma==s.linha[i] ){
+                    
+                linha[k][t.tam]=1;
+            } 
+            
+        }
+           
+        for(int j=0; j<t.tam; j++){ //é aqui que a mágica ocorre (arrumar isso)
+            aux=0;
+            val=0;
+            for(int k=0; k<n; k++){
+                if(linha[k][t.tam]==1)
+                    val=linha[k][j];
+                if(val!=linha[k][j] && linha[k][t.tam]==1){
+                    aux++;
+                    break;
                 }
             }
-            
-        for(int j=0; j<t.tam; j++){
-                aux=0;
-                for(int k=0; k<n; k++){
-                    val=linha[k][0];
-                    if(linha[k][0]!=linha[k][j])
-                        aux++;
-                }
-                if(aux==0){
-            matgab[i][j]=val;
-        } 
+            if(aux==0){
+                matgab[i][j]=val;
+            } 
         }
                    
     }
@@ -246,7 +256,7 @@ int main() {
     Tabela t;
     Soma s;
     
-    t.tam = 5;
+    t.tam = 4;
     t.mat = criarMatriz(t.tam);
     t.resposta = criarMatriz(t.tam);
     t.mat = geraValores(t.mat, t.tam);

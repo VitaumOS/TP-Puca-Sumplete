@@ -36,6 +36,7 @@ void opcoes(){
 
                 if(g.parametro==2)
                     ranking(g.j.nome,g.j.tempoF,g.t.tam, 1);
+                printf("Obrigado por jogar!\n");
                 break;
             case '1': 
                 
@@ -136,10 +137,10 @@ Geral jogo(Tabela t, Soma s, Jogador j, int parametro){
         t=criarMatrizEspelho(t);
         s=criaLinhaColuna(t);
     }
+    montarTab(t,s);
 
     while(vitoria == 0){
 
-        montarTab(t,s);
 
         printf("Escolha o comando desejado: ");
         fgets(t.opcao, M, stdin);
@@ -162,7 +163,6 @@ Geral jogo(Tabela t, Soma s, Jogador j, int parametro){
         }
         else if(!strcmp(opcao,"resolver")){
             t.resposta=resolver(t);
-            montarTab(t,s);
         }
         else if(!strcmp(opcao,"salvar")){
             j.tempoF=time(NULL)-j.tempoI;
@@ -181,6 +181,7 @@ Geral jogo(Tabela t, Soma s, Jogador j, int parametro){
         else{
             printf("Comando Inválido!\n");
         }
+        montarTab(t,s);
 
         vitoria=verificaVitoria(t);
         free(opcao);
@@ -268,32 +269,45 @@ int ** geravalores(int **mat, int n, char d){ //Essa função gera os valores al
             mat[i][j]=m; 
         }
     }
-
     return mat;
 }
 
 
 Tabela criarMatrizEspelho(Tabela t){ //Essa função irá criar uma matriz que possuirá os resultados da matriz original
     
-    int m, n=t.tam;
+    int m, n=t.tam, somal=0,aux=0; 
+    int *somac=criaVetor(n);
     t.quant_manter_total=0;
     t.quant_remover_total=0;
     t.gabarito=criaMatriz(n);
-    for(int i=0; i<n; i++){
-        for(int j=0; j<n; j++){
-            
-            m=rand()%3+1;
+    do{ 
+        for(int i=0; i<n; i++)
+            somac[i]=0;
+        for(int i=0; i<n; i++){       
+            do{
+                somal=0;
+                for(int j=0; j<n; j++){
+                    
+                    m=rand()%2;
 
-            if(m!=3){ //Aqui, em 66% das vezes, um valor será escolhido para a soma
-                t.gabarito[i][j]=1;
-                t.quant_manter_total++;
-            }
-            else{//Nos outros 33%, o valor nn será escolhido, tendo o valor zero
-                t.gabarito[i][j]=2;
-                t.quant_remover_total++;
-            }
+                    if(m){ //Aqui, em 50% das vezes, um valor será escolhido para a soma
+                        t.gabarito[i][j]=1;
+                        t.quant_manter_total++;
+                        somal+=t.mat[i][j];
+                        somac[j]+=t.mat[i][j];
+                    }
+                    else{//Nos outros 50%, o valor nn será escolhido, tendo o valor zero
+                        t.gabarito[i][j]=2;
+                        t.quant_remover_total++;
+                    }
+                }
+            }while(somal==0);
         }
-    }
+        for(int i=0; i<n; i++)
+            if(somac[i]==0)
+                aux=1;
+    }while(aux==1);
+    free(somac);
     return t;
 }
 
@@ -310,7 +324,6 @@ Soma criaLinhaColuna(Tabela tab){ //Essa função soma as linhas e colunas basea
             }
         }
     }
-
     return vet;
 }
 
@@ -323,7 +336,7 @@ void montarTab(Tabela t, Soma vet){ //Essa função monta a tabela do jogo com o
     printf(TAB_TL);
     for(int k=0; k<n+1; k++){
 
-        for(int i=0; i<9; i++)
+        for(int i=0; i<7; i++)
             printf(TAB_HOR); //Repete o "teto" da tabela a quantidade desejada
 
         if(k==n)
@@ -339,21 +352,26 @@ void montarTab(Tabela t, Soma vet){ //Essa função monta a tabela do jogo com o
         
         printf("\n");
         for(int j=0; j<n; j++){
+            printf(TAB_VER);
+            if(t.mat[i][j]>=0)
+                printf(" ");
             if(t.resposta[i][j]==1)
-                printf(TAB_VER GREEN(" %d "), t.mat[i][j]);
+                printf( GREEN("  %d   "), t.mat[i][j]);
             else if(t.resposta[i][j]==2)
-                printf(TAB_VER RED(" %d "), t.mat[i][j]);
+                printf( RED("  %d   "), t.mat[i][j]);
             else
-                printf(TAB_VER " %d ", t.mat[i][j]);
+                printf("  %d   ", t.mat[i][j]);
         }
-        printf(TAB_VER BOLD(" %02d "), vet.linha[i]);
+        printf(TAB_VER BOLD("  %02d  "), vet.linha[i]);
+        if(vet.linha[i]>-10)
+            printf(" ");
         printf(TAB_VER "\n");        
 
         if(i<n){
             printf(TAB_ML);
             for(int k=0; k<n+1; k++){
 
-                for(int i=0; i<9; i++)
+                for(int i=0; i<7; i++)
                     printf(TAB_HOR); 
 
                 if(k==n && i==n-1)
@@ -367,8 +385,11 @@ void montarTab(Tabela t, Soma vet){ //Essa função monta a tabela do jogo com o
     }
     //___________________________________________
     printf("\n");
-    for(int i=0; i<n; i++)
-        printf( TAB_VER BOLD(" %02d "), vet.coluna[i]);
+    for(int i=0; i<n; i++){
+        printf( TAB_VER BOLD("  %02d  "), vet.coluna[i]);
+        if(vet.coluna[i]>-10)
+            printf(" ");
+    }
     printf(TAB_VER);
     printf("\n");
 
@@ -378,7 +399,7 @@ void montarTab(Tabela t, Soma vet){ //Essa função monta a tabela do jogo com o
     printf(TAB_BL);
     for(int k=0; k<n; k++){
 
-        for(int i=0; i<9; i++)
+        for(int i=0; i<7; i++)
             printf(TAB_HOR); 
 
         if(k==n-1)
@@ -534,7 +555,7 @@ void mostraRanking(Ranking r){ //Essa função pega os valores armazenados do ra
 
     for(int i=0; i<QUANTDIMENSOES; i++){
         if(r.tempo[i][0]!=0){
-            printf("Tamanho do Tabuleiro | %d\n", i);
+            printf("Tamanho do Tabuleiro - %d\n", i);
             for(int j=0; j<QUANTJOGADOR; j++){
                 if(r.tempo[i][j]!=0){
                     printf("%d° Lugar - %s\n", j+1, r.nome[i][j]);
@@ -544,7 +565,6 @@ void mostraRanking(Ranking r){ //Essa função pega os valores armazenados do ra
             printf("\n");
         }
     }
-
 }
 
 Geral abreArquivo(char * nome_arq){ //Essa função irá abrir o arquivo de save do jogo e guardá-las nas variáveis
