@@ -71,7 +71,7 @@ Soma criaLinhaColuna(Tabela tab) {
 }
 
 void gabarito(Tabela t, Soma s){
-    int n=pow(2,t.tam), soma=0, quant,aux,val;
+    int n=pow(2,t.tam), soma=0, quant,aux,val, q=0,x, cu=0;
     
     int *linhaF=malloc(t.tam*sizeof(int));
 
@@ -83,10 +83,12 @@ void gabarito(Tabela t, Soma s){
     for(int i=0; i<n; i++)
         linha[i]=calloc((t.tam+1),sizeof(int));
 
-
+    do{
     for(int i=0; i<t.tam; i++){
+        q=0;
         for(int k=0; k<n; k++){
             soma=0;
+            linha[k][t.tam]=0;
             for(int j=0; j<t.tam; j++){
                 if((k>>j)&1){
                     soma+=t.mat[i][j];
@@ -96,30 +98,73 @@ void gabarito(Tabela t, Soma s){
                     linha[k][j]=2;
             }
             if(soma==s.linha[i] ){
-                    
+                q++;    
                 linha[k][t.tam]=1;
             } 
             
         }
+
            
         for(int j=0; j<t.tam; j++){ //é aqui que a mágica ocorre (arrumar isso)
             aux=0;
             val=0;
+            x=0;
             for(int k=0; k<n; k++){
-                if(linha[k][t.tam]==1)
+                if(linha[k][t.tam]==1 && x==0){
                     val=linha[k][j];
-                if(val!=linha[k][j] && linha[k][t.tam]==1){
+                    x=1;
+                }
+                if(val==linha[k][j] && linha[k][t.tam]==1){
                     aux++;
-                    break;
                 }
             }
-            if(aux==0){
-                matgab[i][j]=val;
-            } 
+            if(aux==q)
+                matgab[i][j]=val;    
         }
-                   
+                 
     }
 
+    for(int i=0; i<t.tam; i++){
+        q=0;
+        for(int k=0; k<n; k++){
+            soma=0;
+            linha[k][t.tam]=0;
+            for(int j=0; j<t.tam; j++){
+                if((k>>j)&1){
+                    soma+=t.mat[j][i];
+                    linha[k][j]=1;
+                }
+                else
+                    linha[k][j]=2;
+            }
+            if(soma==s.coluna[i] ){
+                q++;    
+                linha[k][t.tam]=1;
+            } 
+            
+        }
+
+           
+        for(int j=0; j<t.tam; j++){ //é aqui que a mágica ocorre (arrumar isso)
+            aux=0;
+            val=0;
+            x=0;
+            for(int k=0; k<n; k++){
+                if(linha[k][t.tam]==1 && x==0){
+                    val=linha[k][j];
+                    x=1;
+                }
+                if(val==linha[k][j] && linha[k][t.tam]==1){
+                    aux++;
+                }
+            }
+            if(aux==q)
+                matgab[j][i]=val;
+            
+        }
+    }
+            
+    
     printf("\n\n");
     for(int i=0; i<t.tam; i++){
             for(int j=0; j<t.tam; j++)
@@ -153,7 +198,7 @@ void gabarito(Tabela t, Soma s){
                 for(int k=0; k<n; k++){
                     if(linha[k][t.tam]==1){
                         for(int j=0; j<t.tam; j++){
-                         
+
                             linhaF[j]=linha[k][j];
                         }
                     }
@@ -170,16 +215,15 @@ void gabarito(Tabela t, Soma s){
                 if(matgab[i][j]==0)
                     matgab[i][j]=linhaF[j];
             }
-
-            for(int x=0; x<t.tam; x++)
+        for(int x=0; x<t.tam; x++)
                 printf("%d ", linhaF[x]);  
-            printf("Possibilidades: %d\n", quant); 
-        
-        }
+            printf("Possibilidades: %d\n", quant);
+    }
+    
 
         printf("\n");
 
-        for(int i=0; i<t.tam; i++){
+    for(int i=0; i<t.tam; i++){
 
             quant=0;
             for(int k=0; k<n; k++){
@@ -238,12 +282,9 @@ void gabarito(Tabela t, Soma s){
             for(int j=0; j<t.tam; j++)
                 if(matgab[i][j]!=0)
                     aux++;
-
-                
-
-    
-
-   
+        
+    cu++;
+    }while(aux!=(t.tam*t.tam) && cu<=10);
 
     for(int i=0; i<n; i++)
         free(linha[i]);
@@ -256,7 +297,7 @@ int main() {
     Tabela t;
     Soma s;
     
-    t.tam = 4;
+    t.tam = 8;
     t.mat = criarMatriz(t.tam);
     t.resposta = criarMatriz(t.tam);
     t.mat = geraValores(t.mat, t.tam);
@@ -293,6 +334,7 @@ int main() {
         free(t.resposta[i]);
         free(t.gabarito[i]);
     }
+
     
     free(t.mat);
     free(t.resposta);

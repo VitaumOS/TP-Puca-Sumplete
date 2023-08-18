@@ -7,7 +7,7 @@
 #include <math.h>
 #include <time.h>
 
-#define M 266
+#define M 256
 #define TAM 256
 #define QUANTJOGADOR 5
 #define QUANTDIMENSOES 10
@@ -30,7 +30,6 @@ typedef struct{
     int quant_manter;
     int quant_remover;
 
-    int quant_manter_total;
     int quant_remover_total;
 
     char tam_c;
@@ -52,8 +51,8 @@ typedef struct{
 
 typedef struct{
 
-    char nome[QUANTDIMENSOES][QUANTJOGADOR][M];
-    int tempo[QUANTDIMENSOES][QUANTJOGADOR];
+    char ***nome;
+    int **tempo;
 }Ranking;
 
 typedef struct{

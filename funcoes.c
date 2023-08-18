@@ -2,7 +2,7 @@
 
 void opcoes(){
 
-    char opcao;
+    char opcao[4], op;
     char nome_arquivo[TAM];
     Geral g;
     Tabela t;
@@ -21,16 +21,21 @@ void opcoes(){
             printf("Durante o jogo digite 'voltar' para retornar ao menu\n");
 
             printf("Escolha a opção: ");
-            scanf(" %c", &opcao);
-            limparBuffer();
+            
+            fgets(opcao, 4, stdin);
+            op = opcao[0];
+            
             system("clear");
+            
+            if ((strlen(opcao) != 2) || (op < '0' || op > '4')) {
+                printf(RED("Opção Inválida!\n"));
+                limparBuffer();
+            }
 
-            if(opcao<'0' || opcao>'4')
-                printf("Opção Inválida!\n");
-        }while(opcao<'0' || opcao>'4');
+        } while ((strlen(opcao) != 2) || (op < '0' || op > '4'));
 
 
-        switch(opcao){
+        switch(op){
 
             case '0': 
 
@@ -54,17 +59,22 @@ void opcoes(){
                     limparBuffer();
                     system("clear");
                     if(t.tam<3 || t.tam>9)
-                        printf("Valor inválido!\n"); 
+                        printf(RED("Valor inválido!\n"));
+
                 }while(t.tam<3 || t.tam>9);
                 if(t.tam>=5){
                     do{
-                        printf("Agora, digite a dificuldade:| Fácil - F | Médio - M | Difícil - D |: ");
+
+                        printf("Agora, digite a dificuldade (Fácil | Médio | Difícil): ");
                         scanf(" %c", &t.dificuldade);
                         limparBuffer();
                         system("clear");
                         if(t.dificuldade!='F' && t.dificuldade!='M' && t.dificuldade!='D')
-                            printf("Valor inválido!\n");
-                    }while(t.dificuldade!='F' && t.dificuldade!='M' && t.dificuldade!='D');
+                            printf(RED("Valor inválido!\n"));
+                        else if(t.tam<=6 && t.dificuldade=='D')
+                            printf(RED("Dificuldade inválida!\n"));
+
+                    }while((t.dificuldade!='F' && t.dificuldade!='M' && t.dificuldade!='D') || (t.tam<=6 && t.dificuldade=='D'));
                 }
                 else
                     t.dificuldade='F';
@@ -75,19 +85,20 @@ void opcoes(){
             case '2': 
 
                 printf("Digite o nome do arquivo: ");
-                scanf("%s", nome_arquivo);
+                scanf(" %s", nome_arquivo);
                 if(verificaNomeArquivo(nome_arquivo)){
                     g=abreArquivo(nome_arquivo);
                     if(g.parametro==1)
                         g=jogo(g.t,g.s,g.j,1);
                 }
+                limparBuffer();
                 break;
             case '3':
 
                 if(g.parametro==1)
                     g=jogo(g.t, g.s, g.j,1);
                 else 
-                    printf("Você não começou um jogo!\n");
+                    printf(RED("Você não tem um jogo iniciado!\n"));
                 break;
             case '4':
                 ranking(g.j.nome,g.j.tempoF,g.t.tam,0);
@@ -95,21 +106,21 @@ void opcoes(){
                 break;
             default:
 
-                printf("Opção Inválida!\n");
+                printf(RED("Opção Inválida!\n"));
                 break;
         }
-    }while(opcao!='0');
+    }while(op!='0');
 }
 
 int verificaNomeArquivo(char *arquivo){
     int tam,aux=0;
-    char formato[5];
+    char formato[6];
     tam=strlen(arquivo);
     for(int i=tam-4; i<=tam; i++){
         formato[aux]=arquivo[i];
         aux++;
     }
-    if(!strcmp(formato, ".txt"))
+    if(!strcmp(formato,".txt"))
         return 1;
     else{
         printf("Formato incorreto!\n");
@@ -120,7 +131,7 @@ int verificaNomeArquivo(char *arquivo){
 Geral jogo(Tabela t, Soma s, Jogador j, int parametro){
 
     int vitoria=0;
-    int r, len;
+    int r, len,tam;
     char *opcao;
     j.tempoI=time(NULL);
 
@@ -141,27 +152,34 @@ Geral jogo(Tabela t, Soma s, Jogador j, int parametro){
 
     while(vitoria == 0){
 
-
+        printf("Comandos possíveis:\n");
+        printf(GREEN("manter") " (seguido da linha e coluna juntos)\n");
+        printf(RED("remover") " (seguido da linha e coluna juntos)\n");
+        printf("dica\n");
+        printf("resolver\n");
+        printf("salvar (seguido do nome do arquivo)\n");
+        printf("voltar\n\n");
         printf("Escolha o comando desejado: ");
-        fgets(t.opcao, M, stdin);
 
+        fgets(t.opcao, M, stdin);
+        tam=strlen(t.opcao);
         system("clear");
 
         dividePalavra(t.opcao, &opcao);
         len=strlen(opcao);
 
-        if(!strcmp(opcao, "manter") ){
+        if(!strcmp(opcao, "manter") && tam==10){
             t.resposta=resposta(len, t.opcao, t.resposta,t.tam,1);
             t.quant_manter++;
         }
-        else if(!strcmp(opcao,"remover") ){
+        else if(!strcmp(opcao,"remover") && tam==11){
             t.resposta=resposta(len, t.opcao, t.resposta,t.tam,2);
             t.quant_remover++;
         }
-        else if(!strcmp(opcao,"dica")){
+        else if(!strcmp(opcao,"dica") && tam==5){
             t.resposta=dica(t);
         }
-        else if(!strcmp(opcao,"resolver")){
+        else if(!strcmp(opcao,"resolver") && tam==9){
             t.resposta=resolver(t);
         }
         else if(!strcmp(opcao,"salvar")){
@@ -169,7 +187,7 @@ Geral jogo(Tabela t, Soma s, Jogador j, int parametro){
             salvaArquivo(len,t,s,j);
             printf("Jogo Salvo!\n");
         }
-        else if(!strcmp(opcao,"voltar")){
+        else if(!strcmp(opcao,"voltar") && tam==7){
             g.t=t;
             g.j=j;
             g.s=s;
@@ -179,7 +197,7 @@ Geral jogo(Tabela t, Soma s, Jogador j, int parametro){
             return g;
         }
         else{
-            printf("Comando Inválido!\n");
+            printf(RED("Comando Inválido!\n"));
         }
         montarTab(t,s);
 
@@ -232,20 +250,19 @@ int ** dica(Tabela t){ // Essa função seleciona um valor aleatório (desde que
 
 int verificaVitoria(Tabela t){ //Essa função irá comparar os valores colocados pelo jogador na matriz resposta com a matriz gabarito
 
-    int n=t.tam, auxm=0, auxr=0;
+    int n=t.tam, auxr=0,aux=0;
 
     for(int i=0; i<n; i++){
         for(int j=0; j<n; j++){
             if(t.resposta[i][j]==t.gabarito[i][j]){
-                if(t.resposta[i][j]==1)
-                    auxm++;
-                else if(t.resposta[i][j]==2)
+                if(t.resposta[i][j]==2)
                     auxr++;
+                aux++;
             }
                  
         }        
     }
-    if(auxm==t.quant_manter_total || auxr==t.quant_remover_total)
+    if(auxr==t.quant_remover_total || aux==n*n)
         return 1;
     else
         return 0;
@@ -277,22 +294,20 @@ Tabela criarMatrizEspelho(Tabela t){ //Essa função irá criar uma matriz que p
     
     int m, n=t.tam, somal=0,aux=0; 
     int *somac=criaVetor(n);
-    t.quant_manter_total=0;
     t.quant_remover_total=0;
     t.gabarito=criaMatriz(n);
     do{ 
+        aux=0;
         for(int i=0; i<n; i++)
             somac[i]=0;
         for(int i=0; i<n; i++){       
             do{
                 somal=0;
                 for(int j=0; j<n; j++){
-                    
                     m=rand()%2;
 
                     if(m){ //Aqui, em 50% das vezes, um valor será escolhido para a soma
                         t.gabarito[i][j]=1;
-                        t.quant_manter_total++;
                         somal+=t.mat[i][j];
                         somac[j]+=t.mat[i][j];
                     }
@@ -301,6 +316,7 @@ Tabela criarMatrizEspelho(Tabela t){ //Essa função irá criar uma matriz que p
                         t.quant_remover_total++;
                     }
                 }
+
             }while(somal==0);
         }
         for(int i=0; i<n; i++)
@@ -437,11 +453,19 @@ int ** resposta(int l, char *op, int** resposta, int tam,int n){
     return resposta;
 }
 
-
-
 void ranking(char * nome,int tempo, int n, int param){ //Essa é a função geral do Ranking, que controla quando será necessário adicionar um novo jogador ou não
 
     Ranking ranking;
+
+    ranking.nome=malloc(QUANTDIMENSOES*sizeof(char**));
+    ranking.tempo=malloc(QUANTDIMENSOES*sizeof(int*));
+    for(int i=0; i<QUANTDIMENSOES; i++){
+        ranking.nome[i]=malloc(QUANTJOGADOR*sizeof(char*));
+        ranking.tempo[i]=calloc(QUANTJOGADOR,sizeof(int));
+        for(int j=0; j<QUANTJOGADOR; j++)
+            ranking.nome[i][j]=malloc(M*sizeof(char));
+    }
+
     for(int i=0; i<QUANTDIMENSOES; i++)
         for(int j=0; j<QUANTJOGADOR; j++)
             ranking.tempo[i][j]=0;
@@ -452,8 +476,19 @@ void ranking(char * nome,int tempo, int n, int param){ //Essa é a função gera
         ranking=adicionaNovoRanking(nome,tempo,n,ranking);
         atualizaRanking(ranking);
     }
-    else
+    else{
         mostraRanking(ranking);
+    }
+    
+    for(int i=0; i<QUANTDIMENSOES; i++){
+        for(int j=0; j<QUANTJOGADOR; j++)
+            free(ranking.nome[i][j]);
+        free(ranking.tempo[i]);
+        free(ranking.nome[i]);
+    }
+    free(ranking.nome);
+    free(ranking.tempo);
+
 }
 
 Ranking armazenaRanking(Ranking r) {//Essa função armazena os valores dentro do arquivo "sumplete.ini"
@@ -569,7 +604,8 @@ void mostraRanking(Ranking r){ //Essa função pega os valores armazenados do ra
 
 Geral abreArquivo(char * nome_arq){ //Essa função irá abrir o arquivo de save do jogo e guardá-las nas variáveis
 
-    FILE *arq=fopen(nome_arq,"r");
+    FILE *arq=NULL;
+    arq=fopen(nome_arq,"r");
     Geral g;
     if(arq==NULL){
         printf("Erro ao abrir o arquivo\n");
@@ -689,7 +725,7 @@ void dividePalavra(char *op, char **opcao) {//Essa função irá dividir a prime
 
 int ** criaMatriz(int n){ //Essa função cria uma matriz
 
-    int **matriz=calloc(n,sizeof(int*));
+    int **matriz=malloc(n*sizeof(int*));
     for(int i=0; i<n; i++){
         matriz[i]=calloc(n,sizeof(int));
     }
