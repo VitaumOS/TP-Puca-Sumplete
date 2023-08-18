@@ -349,8 +349,10 @@ void montarTab(Tabela t, Soma vet){ //Essa função monta a tabela do jogo com o
     
     //___________________________________________
     // Essa parte gera a parte de cima da tabela
+    for(int i=0; i<8; i++)
+        printf(" ");
     printf(TAB_TL);
-    for(int k=0; k<n+1; k++){
+    for(int k=0; k<n; k++){
 
         for(int i=0; i<7; i++)
             printf(TAB_HOR); //Repete o "teto" da tabela a quantidade desejada
@@ -362,13 +364,45 @@ void montarTab(Tabela t, Soma vet){ //Essa função monta a tabela do jogo com o
     }
     //___________________________________________
 
+    printf("\n");
     //___________________________________________
     //Essa parte mostra os números da matriz junto com as partes intermediárias da tabela
     for(int i=0; i<n; i++){
+
+
+        if(i==0){
+            for(int j=0; j<8; j++)
+                printf(" ");
+            for(int j=1; j<=n; j++){
+                printf(TAB_VER);
+                printf("   %d   ",j);
+            }
+            printf(TAB_VER);
+            printf("\n");
+
+            printf(TAB_ML);
+
+            for(int k=0; k<n+2; k++){
+
+                for(int i=0; i<7; i++)
+                    printf(TAB_HOR); 
+
+                if(k==n+1 && i==n)
+                    printf(TAB_BR);
+                else if(k==n+1)
+                    printf(TAB_MR );
+                else
+                    printf(TAB_MJ);
+            }
+   
+        }
         
         printf("\n");
+        printf(TAB_VER);
+        printf("   %d   ", i+1);
         for(int j=0; j<n; j++){
             printf(TAB_VER);
+            
             if(t.mat[i][j]>=0)
                 printf(" ");
             if(t.resposta[i][j]==1)
@@ -385,14 +419,14 @@ void montarTab(Tabela t, Soma vet){ //Essa função monta a tabela do jogo com o
 
         if(i<n){
             printf(TAB_ML);
-            for(int k=0; k<n+1; k++){
+            for(int k=0; k<n+2; k++){
 
                 for(int i=0; i<7; i++)
                     printf(TAB_HOR); 
 
-                if(k==n && i==n-1)
+                if(k==n+1 && i==n)
                     printf(TAB_BR);
-                else if(k==n)
+                else if(k==n+1)
                     printf(TAB_MR );
                 else
                     printf(TAB_MJ);
@@ -401,6 +435,8 @@ void montarTab(Tabela t, Soma vet){ //Essa função monta a tabela do jogo com o
     }
     //___________________________________________
     printf("\n");
+    for(int i=0; i<8; i++)
+        printf(" ");
     for(int i=0; i<n; i++){
         printf( TAB_VER BOLD("  %02d  "), vet.coluna[i]);
         if(vet.coluna[i]>-10)
@@ -412,6 +448,8 @@ void montarTab(Tabela t, Soma vet){ //Essa função monta a tabela do jogo com o
 
     //___________________________________________
     //Essa parte gera a parte debaixo da tabela
+    for(int i=0; i<8; i++)
+        printf(" ");
     printf(TAB_BL);
     for(int k=0; k<n; k++){
 
@@ -487,51 +525,40 @@ void ranking(char * nome,int tempo, int n, int param){ //Essa é a função gera
 
 }
 
-Ranking armazenaRanking(Ranking r) {//Essa função armazena os valores dentro do arquivo "sumplete.ini"
+Ranking armazenaRanking(Ranking r) {
     FILE *arq = fopen("sumplete.ini", "r");
-    char linha[M], *opcao, *opcao2, nome[M], numero[2];
-    int n, tam, tam_total, aux, i;
+    char linha[M], nome[M], numero[2];
+    int n, tam_total, aux, i;
 
     while (!feof(arq)) {
         i = -1;
         fgets(linha, M, arq);
-        dividePalavra(linha, &opcao);
 
-        if (!strcmp(opcao, "size")) {
+        if (strstr(linha, "size") != NULL) {
             n = linha[7] - '0';
-            n-=3;
-
-            free(opcao);
-
+            n -= 3;
             do {
                 i++;
                 for (int k = 0; k < 2; k++) {
                     aux = 0;
                     fgets(linha, M, arq);
                     tam_total = strlen(linha);
-                    dividePalavra(linha, &opcao2);
 
-                    tam = strlen(opcao2);
-                    opcao2[tam - 1] = '\0';
-
-                    if (!strcmp(opcao2, "player")) {
-
-                        for (int j = tam + 3; j < tam_total - 1; j++) {
+                    if (strstr(linha, "player") != NULL) {
+                        for (int j = 10; j < tam_total - 1; j++) {
                             nome[aux] = linha[j];
                             aux++;
                         }
                         nome[aux] = '\0';
                         strcpy(r.nome[n][i], nome);
                     } 
-                    else if (!strcmp(opcao2, "time")) {
-                        
-                        for (int j = tam + 3; j < tam_total - 1; j++) {
+                    else if (strstr(linha, "time") != NULL) {
+                        for (int j = 8; j < tam_total - 1; j++) {
                             numero[0] = linha[j];
                             numero[1] = '\0';
                             r.tempo[n][i] = r.tempo[n][i] * 10 + atoi(numero);
                         }
                     }
-                    free(opcao2);
                 }
             } while (r.tempo[n][i] != 0);
         }
@@ -539,6 +566,7 @@ Ranking armazenaRanking(Ranking r) {//Essa função armazena os valores dentro d
     fclose(arq);
     return r;
 }
+
 
 Ranking adicionaNovoRanking(char *nome, int tempo, int n, Ranking r) {//Essa função pega o novo jogador e seu tempo e o coloca na sua devida posição dentro das variáveis
     int i = 0, aux1 = tempo, aux2;

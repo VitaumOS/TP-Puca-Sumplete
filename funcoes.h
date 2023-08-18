@@ -143,8 +143,6 @@ Geral abreArquivo(char * nome_arq);
 int verificaVitoria(Tabela t);
 int verificaNomeArquivo(char *arquivo);
 
-
-
 int * criaVetor(int n);
 
 int ** resposta(int l, char *op, int** resposta, int tam, int n);
