@@ -357,7 +357,7 @@ void montarTab(Tabela t, Soma vet){ //Essa função monta a tabela do jogo com o
         for(int i=0; i<7; i++)
             printf(TAB_HOR); //Repete o "teto" da tabela a quantidade desejada
 
-        if(k==n)
+        if(k==n-1)
             printf(TAB_TR);
         else
             printf(TAB_TJ);   
@@ -380,23 +380,20 @@ void montarTab(Tabela t, Soma vet){ //Essa função monta a tabela do jogo com o
             printf(TAB_VER);
             printf("\n");
 
-            printf(TAB_ML);
+            printf(TAB_TL);
 
             for(int k=0; k<n+2; k++){
 
                 for(int i=0; i<7; i++)
                     printf(TAB_HOR); 
 
-                if(k==n+1 && i==n)
-                    printf(TAB_BR);
-                else if(k==n+1)
-                    printf(TAB_MR );
+                if(k==n+1)
+                    printf(TAB_TR);
                 else
                     printf(TAB_MJ);
             }
    
         }
-        
         printf("\n");
         printf(TAB_VER);
         printf("   %d   ", i+1);
@@ -418,13 +415,16 @@ void montarTab(Tabela t, Soma vet){ //Essa função monta a tabela do jogo com o
         printf(TAB_VER "\n");        
 
         if(i<n){
-            printf(TAB_ML);
+            if(i==n-1)
+                printf(TAB_BL);
+            else
+                printf(TAB_ML);
             for(int k=0; k<n+2; k++){
 
                 for(int i=0; i<7; i++)
                     printf(TAB_HOR); 
 
-                if(k==n+1 && i==n)
+                if(k==n+1 && i==n-1)
                     printf(TAB_BR);
                 else if(k==n+1)
                     printf(TAB_MR );
