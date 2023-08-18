@@ -71,7 +71,7 @@ Soma criaLinhaColuna(Tabela tab) {
 }
 
 void gabarito(Tabela t, Soma s){
-    int n=pow(2,t.tam), soma=0, quant,aux,val, q=0,x, cu=0;
+    int n=pow(2,t.tam), soma=0, quant,aux,val, q=0,x, cont=0, aux2;
     
     int *linhaF=malloc(t.tam*sizeof(int));
 
@@ -82,7 +82,7 @@ void gabarito(Tabela t, Soma s){
     int **linha=calloc(n,sizeof(int*));
     for(int i=0; i<n; i++)
         linha[i]=calloc((t.tam+1),sizeof(int));
-
+do{
     do{
     for(int i=0; i<t.tam; i++){
         q=0;
@@ -283,8 +283,34 @@ void gabarito(Tabela t, Soma s){
                 if(matgab[i][j]!=0)
                     aux++;
         
-    cu++;
-    }while(aux!=(t.tam*t.tam) && cu<=10);
+    cont++;
+    }while(aux!=(t.tam*t.tam) && cont<=20);
+    aux2=0;
+    int x=0;
+    while(x<t.tam){
+            for(int j=0; j<t.tam; j++){
+                if(matgab[x][j]==0){
+                    matgab[x][j]=rand()%2 + 1;
+                    aux2=1;
+                }
+                if(aux2==1)
+                    break;
+            }
+            if(aux2==1)
+                break;
+        x++;
+    }
+    }while(aux2!=0);
+    aux=0;
+    for(int i=0; i<t.tam; i++)
+            for(int j=0; j<t.tam; j++)
+                if(matgab[i][j]==t.gabarito[i][j])
+                    aux++;
+
+    if(aux==(t.tam*t.tam))
+        printf("As matrizes são iguais!\n");
+    else    
+        printf("As matrizes NAO sao iguais!\n");
 
     for(int i=0; i<n; i++)
         free(linha[i]);
@@ -297,7 +323,7 @@ int main() {
     Tabela t;
     Soma s;
     
-    t.tam = 8;
+    t.tam = 7;
     t.mat = criarMatriz(t.tam);
     t.resposta = criarMatriz(t.tam);
     t.mat = geraValores(t.mat, t.tam);
@@ -327,6 +353,8 @@ int main() {
     printf("\n");printf("\n");
 
     gabarito(t,s);
+
+    
     
     // Liberar memória alocada
     for (int i = 0; i < t.tam; i++) {

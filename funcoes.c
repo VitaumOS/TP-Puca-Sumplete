@@ -3,7 +3,7 @@
 void opcoes(){
 
     char opcao[4], op;
-    char nome_arquivo[TAM];
+    char nome_arquivo[M];
     Geral g;
     Tabela t;
     Soma s;
@@ -46,7 +46,7 @@ void opcoes(){
             case '1': 
                 
                 printf("Primeiramente, digite seu nome: ");
-                fgets(j.nome, TAM, stdin);
+                fgets(j.nome, M, stdin);
                 j.tam_nome=strlen(j.nome);
                 j.nome[j.tam_nome-1]='\0';
                 system("clear");
@@ -85,7 +85,7 @@ void opcoes(){
             case '2': 
 
                 printf("Digite o nome do arquivo: ");
-                scanf(" %s", nome_arquivo);
+                scanf("%s", nome_arquivo);
                 if(verificaNomeArquivo(nome_arquivo)){
                     g=abreArquivo(nome_arquivo);
                     if(g.parametro==1)
@@ -466,10 +466,6 @@ void ranking(char * nome,int tempo, int n, int param){ //Essa é a função gera
             ranking.nome[i][j]=malloc(M*sizeof(char));
     }
 
-    for(int i=0; i<QUANTDIMENSOES; i++)
-        for(int j=0; j<QUANTJOGADOR; j++)
-            ranking.tempo[i][j]=0;
-
     ranking=armazenaRanking(ranking);
 
     if(param){
@@ -503,6 +499,8 @@ Ranking armazenaRanking(Ranking r) {//Essa função armazena os valores dentro d
 
         if (!strcmp(opcao, "size")) {
             n = linha[7] - '0';
+            n-=3;
+
             free(opcao);
 
             do {
@@ -544,6 +542,7 @@ Ranking armazenaRanking(Ranking r) {//Essa função armazena os valores dentro d
 
 Ranking adicionaNovoRanking(char *nome, int tempo, int n, Ranking r) {//Essa função pega o novo jogador e seu tempo e o coloca na sua devida posição dentro das variáveis
     int i = 0, aux1 = tempo, aux2;
+    n-=3;
     char c_aux1[M], c_aux2[M];
     strcpy(c_aux1, nome);
 
@@ -566,14 +565,12 @@ Ranking adicionaNovoRanking(char *nome, int tempo, int n, Ranking r) {//Essa fun
     return r;
 }
 
-
 void atualizaRanking(Ranking r){ //Essa função atualiza o arquivo "sumplete.ini" quando tem-se um novo jogador
-
     FILE *arq=fopen("sumplete.ini","w");
     for(int i=0; i<QUANTDIMENSOES; i++){
 
         if(r.tempo[i][0]!=0){
-            fprintf(arq, "size = %d\n", i);
+            fprintf(arq, "size = %d\n", i+3);
             for(int j=0; j<QUANTJOGADOR; j++){
                 if(r.tempo[i][j]!=0){
                     fprintf(arq,"player%d = %s\n", j+1, r.nome[i][j]);
@@ -590,7 +587,7 @@ void mostraRanking(Ranking r){ //Essa função pega os valores armazenados do ra
 
     for(int i=0; i<QUANTDIMENSOES; i++){
         if(r.tempo[i][0]!=0){
-            printf("Tamanho do Tabuleiro - %d\n", i);
+            printf("Tamanho do Tabuleiro - %d\n", i+3);
             for(int j=0; j<QUANTJOGADOR; j++){
                 if(r.tempo[i][j]!=0){
                     printf("%d° Lugar - %s\n", j+1, r.nome[i][j]);
@@ -602,68 +599,69 @@ void mostraRanking(Ranking r){ //Essa função pega os valores armazenados do ra
     }
 }
 
-Geral abreArquivo(char * nome_arq){ //Essa função irá abrir o arquivo de save do jogo e guardá-las nas variáveis
-
-    FILE *arq=NULL;
-    arq=fopen(nome_arq,"r");
+Geral abreArquivo(char *nome_arq) {
+    FILE *arq = fopen(nome_arq, "r");
     Geral g;
-    if(arq==NULL){
-        printf("Erro ao abrir o arquivo\n");
+
+    if (arq == NULL) {
+        printf(RED("Erro ao abrir o arquivo"));
         g.parametro=0;
         return g;
     }
-    
-    fscanf(arq,"%d", &g.t.tam);
-    int n=g.t.tam;
-    g.t.mat=criaMatriz(g.t.tam);
-    g.t.resposta=criaMatriz(g.t.tam);
-    g.s.linha=criaVetor(g.t.tam);
-    g.s.coluna=criaVetor(g.t.tam);
 
-    for(int i=0; i<n; i++){
-        for(int j=0; j<n; j++){
-            fscanf(arq,"%d", &g.t.mat[i][j]);
+    fscanf(arq, "%d", &g.t.tam);
+    int n = g.t.tam;
+    g.t.mat = criaMatriz(g.t.tam);
+    g.t.resposta = criaMatriz(g.t.tam);
+    g.s.linha = criaVetor(g.t.tam);
+    g.s.coluna = criaVetor(g.t.tam);
+
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            fscanf(arq, "%d ", &g.t.mat[i][j]);
         }
     }
-    for(int i=0; i<n; i++){
-        fscanf(arq,"%d",&g.s.linha[i]);
+    for (int i = 0; i < n; i++) {
+        fscanf(arq, "%d ", &g.s.linha[i]);
     }
 
-    for(int i=0; i<n; i++){
-        fscanf(arq,"%d",&g.s.coluna[i]);
+    for (int i = 0; i < n; i++) {
+        fscanf(arq, "%d ", &g.s.coluna[i]);
     }
 
-    fscanf(arq,"%d", &g.t.quant_manter);
+    fscanf(arq, "%d", &g.t.quant_manter);
     int l, c;
-    for(int i=0; i<g.t.quant_manter; i++){
-        fscanf(arq,"%d %d",&l,&c);
-        g.t.resposta[l-1][c-1]=1;
+    for (int i = 0; i < g.t.quant_manter; i++) {
+        fscanf(arq, "%d", &l);
+        fscanf(arq, "%d", &c);
+        g.t.resposta[l - 1][c - 1] = 1;
     }
-    fscanf(arq,"%d", &g.t.quant_remover);
-    for(int i=0; i<g.t.quant_remover; i++){
-        fscanf(arq,"%d %d",&l,&c);
-        g.t.resposta[l-1][c-1]=2;
+    fscanf(arq, "%d", &g.t.quant_remover);
+    for (int i = 0; i < g.t.quant_remover; i++) {
+        fscanf(arq, "%d", &l);
+        fscanf(arq, "%d", &c);
+        g.t.resposta[l - 1][c - 1] = 2;
     }
-    fgets(g.j.nome,sizeof(g.j.nome),arq);
-    fscanf(arq,"%d", &g.j.tempoT);
+    fgets(g.j.nome, M, arq);
+    // Remove a quebra de linha (\n) do nome
+    g.j.nome[strlen(g.j.nome)-1] = '\0';
+
+    fscanf(arq, "%d", &g.j.tempoT);
 
     fclose(arq);
-    g.parametro=1;
-    limpamatriz(&g.t.mat,g.t.tam);
-    limpamatriz(&g.t.resposta,g.t.tam);
-    limpavetor(&g.s.linha);
-    limpavetor(&g.s.coluna);
-    return g;
 
+    g.parametro = 1;
+    return g;
 }
+
 
 void salvaArquivo(int l, Tabela t, Soma s, Jogador j){ //Essa função cria o arquivo com o nome desejado pelo jogador
 
-    char nome[TAM];
+    char nome[M];
     l++;//Pulando o espaço do comando 'salvar texto.txt'
     int n=0;
     
-    while(t.opcao[l]!='\0'){ //Esse while vai pegar o nome escolhido pelo jogador para salvar
+    while(t.opcao[l]!='\n'){ //Esse while vai pegar o nome escolhido pelo jogador para salvar
         nome[n]=t.opcao[l];
         n++;
         l++;
@@ -704,7 +702,6 @@ void salvaArquivo(int l, Tabela t, Soma s, Jogador j){ //Essa função cria o ar
     fprintf(arq,"%d", j.tempoF);
 
     fclose(arq);
-
 }
 
 void limparBuffer() { //Essa função limpa o buffer

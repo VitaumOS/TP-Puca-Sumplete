@@ -8,9 +8,8 @@
 #include <time.h>
 
 #define M 256
-#define TAM 256
 #define QUANTJOGADOR 5
-#define QUANTDIMENSOES 10
+#define QUANTDIMENSOES 7
 #define TAM_COMANDO 12
 
 typedef struct{
@@ -41,7 +40,7 @@ typedef struct{
 
 typedef struct{
 
-    char nome[TAM];
+    char nome[M];
     int tam_nome;
     int tempoF;
     int tempoI;
