@@ -71,7 +71,8 @@ Soma criaLinhaColuna(Tabela tab) {
 }
 
 void gabarito(Tabela t, Soma s){
-    int n=pow(2,t.tam), soma=0, quant,aux,val, q=0,x, cont=0, aux2;
+    int n=pow(2,t.tam), soma=0, quant,aux,val, q=0,x, cont=0, aux2, quant_zero=0;;
+    int l,c;
     
     int *linhaF=malloc(t.tam*sizeof(int));
 
@@ -83,6 +84,45 @@ void gabarito(Tabela t, Soma s){
     for(int i=0; i<n; i++)
         linha[i]=calloc((t.tam+1),sizeof(int));
 do{
+    quant_zero=0;   
+
+    for(int i=0; i<t.tam; i++){
+            quant=0;
+            for(int k=0; k<n; k++){
+                soma=0;
+                for(int j=0; j<t.tam; j++)
+                    if((k>>j)&1)
+                        soma+=t.mat[i][j];
+                if(soma==s.linha[i])
+                    quant++;  
+            }
+            if(quant==0)
+                quant_zero++;
+    }
+    for(int i=0; i<t.tam; i++){
+            quant=0;
+            for(int k=0; k<n; k++){
+                soma=0;
+                linha[k][t.tam]=0;
+                for(int j=0; j<t.tam; j++)
+                    if((k>>j)&1)
+                        soma+=t.mat[j][i]; 
+                if(soma==s.coluna[i])
+                    quant++;
+            }
+            if(quant==0)
+                quant_zero++;
+    }
+
+
+    if(quant_zero>0){
+        if(matgab[l][c]==1)
+            matgab[l][c]=2;
+        else 
+            matgab[l][c]=1;
+    }
+
+    else if(quant_zero==0){
     do{
     for(int i=0; i<t.tam; i++){
         q=0;
@@ -100,11 +140,8 @@ do{
             if(soma==s.linha[i] ){
                 q++;    
                 linha[k][t.tam]=1;
-            } 
-            
-        }
-
-           
+            }  
+        }    
         for(int j=0; j<t.tam; j++){ //é aqui que a mágica ocorre (arrumar isso)
             aux=0;
             val=0;
@@ -120,9 +157,9 @@ do{
             }
             if(aux==q)
                 matgab[i][j]=val;    
-        }
-                 
+        }          
     }
+
 
     for(int i=0; i<t.tam; i++){
         q=0;
@@ -141,10 +178,7 @@ do{
                 q++;    
                 linha[k][t.tam]=1;
             } 
-            
-        }
-
-           
+        }    
         for(int j=0; j<t.tam; j++){ //é aqui que a mágica ocorre (arrumar isso)
             aux=0;
             val=0;
@@ -159,11 +193,9 @@ do{
                 }
             }
             if(aux==q)
-                matgab[j][i]=val;
-            
+                matgab[j][i]=val;  
         }
-    }
-            
+    }        
     
     printf("\n\n");
     for(int i=0; i<t.tam; i++){
@@ -204,7 +236,7 @@ do{
                     }
                     
                 }
-            }   
+            }
             else{
                 
                 for(int j=0; j<t.tam; j++)
@@ -219,8 +251,6 @@ do{
                 printf("%d ", linhaF[x]);  
             printf("Possibilidades: %d\n", quant);
     }
-    
-
         printf("\n");
 
     for(int i=0; i<t.tam; i++){
@@ -255,12 +285,13 @@ do{
                     }
                     
                 }
-            }   
+            }  
             else{
-                
+        
                 for(int j=0; j<t.tam; j++)
                     linhaF[j]=0; 
             }
+
 
             for(int j=0; j<t.tam; j++)
                 if(matgab[j][i]==0)
@@ -284,13 +315,24 @@ do{
                     aux++;
         
     cont++;
-    }while(aux!=(t.tam*t.tam) && cont<=20);
+    }while(aux!=(t.tam*t.tam) && cont<=10);
+    }
+    
     aux2=0;
     int x=0;
+    if(quant_zero>0){
+        if(matgab[l][c]==1)
+            matgab[l][c]=2;
+        else 
+            matgab[l][c]=1;
+    }
+    
     while(x<t.tam){
             for(int j=0; j<t.tam; j++){
                 if(matgab[x][j]==0){
                     matgab[x][j]=rand()%2 + 1;
+                    l=x;
+                    c=j;
                     aux2=1;
                 }
                 if(aux2==1)
@@ -300,14 +342,35 @@ do{
                 break;
         x++;
     }
-    }while(aux2!=0);
+    
+    
+    }while(aux2!=0 && quant_zero==0);
     aux=0;
-    for(int i=0; i<t.tam; i++)
-            for(int j=0; j<t.tam; j++)
-                if(matgab[i][j]==t.gabarito[i][j])
-                    aux++;
+    for(int i=0; i<t.tam; i++){
+            soma=0;
+            for(int j=0; j<t.tam; j++){
+                if(matgab[i][j]==1){
+                    soma+=t.mat[i][j];
+                }
+            }
 
-    if(aux==(t.tam*t.tam))
+            if(soma==s.linha[i]){
+                aux++;
+            }
+    }
+    for(int i=0; i<t.tam; i++){
+            soma=0;
+            for(int j=0; j<t.tam; j++){
+                if(matgab[j][i]==1){
+                    soma+=t.mat[j][i];
+                }
+            }
+            if(soma==s.coluna[i]){
+                aux++;
+            }
+    }
+
+    if(aux==(t.tam*2))
         printf("As matrizes são iguais!\n");
     else    
         printf("As matrizes NAO sao iguais!\n");
@@ -323,7 +386,7 @@ int main() {
     Tabela t;
     Soma s;
     
-    t.tam = 7;
+    t.tam = 9;
     t.mat = criarMatriz(t.tam);
     t.resposta = criarMatriz(t.tam);
     t.mat = geraValores(t.mat, t.tam);

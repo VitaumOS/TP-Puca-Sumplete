@@ -5,9 +5,6 @@ void opcoes(){
     char opcao[4], op;
     char nome_arquivo[M];
     Geral g;
-    Tabela t;
-    Soma s;
-    Jogador j;
 
     printf("Bem vindo ao Jogo SUMPLETE!\n");
     do{
@@ -41,45 +38,53 @@ void opcoes(){
 
                 if(g.parametro==2)
                     ranking(g.j.nome,g.j.tempoF,g.t.tam, 1);
+                else if(g.parametro==1){
+                    limpamatriz(&g.t.mat, g.t.tam);
+                    limpamatriz(&g.t.resposta, g.t.tam);
+                    limpamatriz(&g.t.gabarito, g.t.tam);
+                    limpavetor(&g.s.linha);
+                    limpavetor(&g.s.coluna);
+                }
+
                 printf("Obrigado por jogar!\n");
                 break;
             case '1': 
                 
                 printf("Primeiramente, digite seu nome: ");
-                fgets(j.nome, M, stdin);
-                j.tam_nome=strlen(j.nome);
-                j.nome[j.tam_nome-1]='\0';
+                fgets(g.j.nome, M, stdin);
+                g.j.tam_nome=strlen(g.j.nome);
+                g.j.nome[g.j.tam_nome-1]='\0';
                 system("clear");
 
                 do{
 
-                    printf("%s, Digite a dimensão que deseja (de 3 a 9): ", j.nome);
-                    scanf(" %c", &t.tam_c);
-                    t.tam=t.tam_c-'0';
+                    printf("%s, Digite a dimensão que deseja (de 3 a 9): ", g.j.nome);
+                    scanf(" %c", &g.t.tam_c);
+                    g.t.tam=g.t.tam_c-'0';
                     limparBuffer();
                     system("clear");
-                    if(t.tam<3 || t.tam>9)
+                    if(g.t.tam<3 || g.t.tam>9)
                         printf(RED("Valor inválido!\n"));
 
-                }while(t.tam<3 || t.tam>9);
-                if(t.tam>=5){
+                }while(g.t.tam<3 || g.t.tam>9);
+                if(g.t.tam>=5){
                     do{
 
                         printf("Agora, digite a dificuldade (Fácil | Médio | Difícil): ");
-                        scanf(" %c", &t.dificuldade);
+                        scanf(" %c", &g.t.dificuldade);
                         limparBuffer();
                         system("clear");
-                        if(t.dificuldade!='F' && t.dificuldade!='M' && t.dificuldade!='D')
+                        if(g.t.dificuldade!='F' && g.t.dificuldade!='M' && g.t.dificuldade!='D')
                             printf(RED("Valor inválido!\n"));
-                        else if(t.tam<=6 && t.dificuldade=='D')
+                        else if(g.t.tam<=6 && g.t.dificuldade=='D')
                             printf(RED("Dificuldade inválida!\n"));
 
-                    }while((t.dificuldade!='F' && t.dificuldade!='M' && t.dificuldade!='D') || (t.tam<=6 && t.dificuldade=='D'));
+                    }while((g.t.dificuldade!='F' && g.t.dificuldade!='M' && g.t.dificuldade!='D') || (g.t.tam<=6 && g.t.dificuldade=='D'));
                 }
                 else
-                    t.dificuldade='F';
+                    g.t.dificuldade='F';
                 
-                g=jogo(t, s,j,0);
+                g=jogo(g,0);
 
                 break;
             case '2': 
@@ -89,14 +94,14 @@ void opcoes(){
                 if(verificaNomeArquivo(nome_arquivo)){
                     g=abreArquivo(nome_arquivo);
                     if(g.parametro==1)
-                        g=jogo(g.t,g.s,g.j,1);
+                        g=jogo(g,1);
                 }
                 limparBuffer();
                 break;
             case '3':
 
                 if(g.parametro==1)
-                    g=jogo(g.t, g.s, g.j,1);
+                    g=jogo(g,1);
                 else 
                     printf(RED("Você não tem um jogo iniciado!\n"));
                 break;
@@ -128,27 +133,28 @@ int verificaNomeArquivo(char *arquivo){
     }
 }
 
-Geral jogo(Tabela t, Soma s, Jogador j, int parametro){
+Geral jogo(Geral g, int parametro){
 
     int vitoria=0;
     int r, len,tam;
     char *opcao;
-    j.tempoI=time(NULL);
+    g.j.tempoI=time(NULL);
 
-    Geral g;
+    
     if(parametro==0){
-        j.tempoT=0;
+        g.j.tempoT=0;
 
-        t.quant_manter=0;
-        t.quant_remover=0;
+        g.t.quant_manter=0;
+        g.t.quant_remover=0;
 
-        t.mat=criaMatriz(t.tam);
-        t.resposta=criaMatriz(t.tam);
-        t.mat=geravalores(t.mat, t.tam, t.dificuldade);
-        t=criarMatrizEspelho(t);
-        s=criaLinhaColuna(t);
+        g.t.mat=criaMatriz(g.t.tam);
+        g.t.resposta=criaMatriz(g.t.tam);
+        g.t.mat=geravalores(g.t.mat, g.t.tam, g.t.dificuldade);
+        g.t=criarMatrizEspelho(g.t);
+        g.s=criaLinhaColuna(g.t);
     }
-    montarTab(t,s);
+
+    montarTab(g.t,g.s);
 
     while(vitoria == 0){
 
@@ -161,64 +167,57 @@ Geral jogo(Tabela t, Soma s, Jogador j, int parametro){
         printf("voltar\n\n");
         printf("Escolha o comando desejado: ");
 
-        fgets(t.opcao, M, stdin);
-        tam=strlen(t.opcao);
+        fgets(g.t.opcao, M, stdin);
+        tam=strlen(g.t.opcao);
         system("clear");
 
-        dividePalavra(t.opcao, &opcao);
+        dividePalavra(g.t.opcao, &opcao);
         len=strlen(opcao);
 
         if(!strcmp(opcao, "manter") && tam==10){
-            t.resposta=resposta(len, t.opcao, t.resposta,t.tam,1);
-            t.quant_manter++;
+            g.t.resposta=resposta(len, g.t.opcao, g.t.resposta,g.t.tam,1);
+            g.t.quant_manter++;
         }
         else if(!strcmp(opcao,"remover") && tam==11){
-            t.resposta=resposta(len, t.opcao, t.resposta,t.tam,2);
-            t.quant_remover++;
+            g.t.resposta=resposta(len, g.t.opcao, g.t.resposta,g.t.tam,2);
+            g.t.quant_remover++;
         }
         else if(!strcmp(opcao,"dica") && tam==5){
-            t.resposta=dica(t);
+            g.t.resposta=dica(g.t);
         }
         else if(!strcmp(opcao,"resolver") && tam==9){
-            t.resposta=resolver(t);
+            g.t.resposta=resolver(g.t);
         }
         else if(!strcmp(opcao,"salvar")){
-            j.tempoF=time(NULL)-j.tempoI;
-            salvaArquivo(len,t,s,j);
+            g.j.tempoF=time(NULL)-g.j.tempoI;
+            salvaArquivo(len,g.t,g.s,g.j);
             printf("Jogo Salvo!\n");
         }
         else if(!strcmp(opcao,"voltar") && tam==7){
-            g.t=t;
-            g.j=j;
-            g.s=s;
             g.parametro=1;
-            g.j.tempoT=(time(NULL)-j.tempoI)+j.tempoT;
-
+            g.j.tempoT=(time(NULL)-g.j.tempoI)+g.j.tempoT;
             return g;
         }
         else{
             printf(RED("Comando Inválido!\n"));
         }
-        montarTab(t,s);
+        montarTab(g.t,g.s);
 
-        vitoria=verificaVitoria(t);
+        vitoria=verificaVitoria(g.t);
         free(opcao);
 
     }
-    j.tempoF=(time(NULL)-j.tempoI)+j.tempoT;
+    g.j.tempoF=(time(NULL)-g.j.tempoI)+g.j.tempoT;
     printf("VOCÊ GANHOU!\n");
-    printf("Você terminou o jogo em %d segundos!\n", j.tempoF);
-    g.t.tam=t.tam;
-    g.j.tempoF=j.tempoF;
-    strcpy(g.j.nome,j.nome);
-    g.parametro=2;
-    limpamatriz(&t.mat, t.tam);
-    limpamatriz(&t.resposta, t.tam);
-    limpamatriz(&t.gabarito, t.tam);
-    limpavetor(&s.linha);
-    limpavetor(&s.coluna);
+    printf("Você terminou o jogo em %d segundos!\n", g.j.tempoF);
 
-    
+    g.parametro=2;
+    limpamatriz(&g.t.mat, g.t.tam);
+    limpamatriz(&g.t.resposta, g.t.tam);
+    limpamatriz(&g.t.gabarito, g.t.tam);
+    limpavetor(&g.s.linha);
+    limpavetor(&g.s.coluna);
+
     return g;
 }
 
@@ -500,8 +499,10 @@ void ranking(char * nome,int tempo, int n, int param){ //Essa é a função gera
     for(int i=0; i<QUANTDIMENSOES; i++){
         ranking.nome[i]=malloc(QUANTJOGADOR*sizeof(char*));
         ranking.tempo[i]=calloc(QUANTJOGADOR,sizeof(int));
-        for(int j=0; j<QUANTJOGADOR; j++)
+        for(int j=0; j<QUANTJOGADOR; j++){
             ranking.nome[i][j]=malloc(M*sizeof(char));
+            strcpy(ranking.nome[i][j], "");
+        }
     }
 
     ranking=armazenaRanking(ranking);
@@ -575,7 +576,7 @@ Ranking adicionaNovoRanking(char *nome, int tempo, int n, Ranking r) {//Essa fun
     strcpy(c_aux1, nome);
 
     while (i < QUANTJOGADOR) {
-        if (tempo < r.tempo[n][i] || r.tempo[n][0] == 0) {
+        if (tempo < r.tempo[n][i] || r.tempo[n][i]==0) {
             for(int j=i; j<QUANTJOGADOR; j++) {
                 aux2 = r.tempo[n][j];
                 strcpy(c_aux2, r.nome[n][j]);
@@ -632,7 +633,7 @@ Geral abreArquivo(char *nome_arq) {
     Geral g;
 
     if (arq == NULL) {
-        printf(RED("Erro ao abrir o arquivo"));
+        printf(RED("Erro ao abrir o arquivo\n"));
         g.parametro=0;
         return g;
     }

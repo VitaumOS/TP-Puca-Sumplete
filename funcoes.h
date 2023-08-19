@@ -137,7 +137,7 @@ Soma criaLinhaColuna(Tabela tab);
 Ranking armazenaRanking(Ranking r);
 Ranking adicionaNovoRanking(char *nome,int tempo, int n, Ranking r);
 
-Geral jogo(Tabela t, Soma s, Jogador j, int parametro);
+Geral jogo(Geral g, int parametro);
 Geral abreArquivo(char * nome_arq);
 
 int verificaVitoria(Tabela t);
