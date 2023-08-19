@@ -1,3 +1,4 @@
+//Vitor de Oliveira Silva 23.1.4023
 #ifndef FUNCOES_H
 #define FUNCOES_H
 
@@ -10,7 +11,6 @@
 #define M 256
 #define QUANTJOGADOR 5
 #define QUANTDIMENSOES 7
-#define TAM_COMANDO 12
 
 typedef struct{
     
@@ -28,10 +28,8 @@ typedef struct{
     int tam;
     int quant_manter;
     int quant_remover;
-
     int quant_remover_total;
 
-    char tam_c;
     char dificuldade;
 
     char opcao[M];
@@ -127,7 +125,6 @@ void montarTab(Tabela t, Soma vet);
 void limpavetor(int **vet);
 void ranking(char *nome,int tempo, int n, int param);
 void mostraRanking(Ranking r);
-void limpachar(char *op);
 void dividePalavra(char *op, char **opcao);
 
 Tabela criarMatrizEspelho(Tabela t);
@@ -140,7 +137,7 @@ Ranking adicionaNovoRanking(char *nome,int tempo, int n, Ranking r);
 Geral jogo(Geral g, int parametro);
 Geral abreArquivo(char * nome_arq);
 
-int verificaVitoria(Tabela t);
+int verificaVitoria(Tabela t, Soma s);
 int verificaNomeArquivo(char *arquivo);
 
 int * criaVetor(int n);

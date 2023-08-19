@@ -1,3 +1,4 @@
+//Vitor de Oliveira Silva 23.1.4023
 #include "funcoes.h"
 
 void opcoes(){
@@ -5,7 +6,9 @@ void opcoes(){
     char opcao[4], op;
     char nome_arquivo[M];
     Geral g;
+    g.parametro=0;
 
+    system("clear");
     printf("Bem vindo ao Jogo SUMPLETE!\n");
     do{
         
@@ -58,13 +61,16 @@ void opcoes(){
 
                 do{
 
-                    printf("%s, Digite a dimensão que deseja (de 3 a 9): ", g.j.nome);
-                    scanf(" %c", &g.t.tam_c);
-                    g.t.tam=g.t.tam_c-'0';
-                    limparBuffer();
+                    printf("%s, digite a dimensão que deseja (de 3 a 9): ", g.j.nome);
+
+                    fgets(opcao, 4, stdin);
+                    g.t.tam = atoi(opcao);
+
                     system("clear");
-                    if(g.t.tam<3 || g.t.tam>9)
+                    if(g.t.tam<3 || g.t.tam>9){
                         printf(RED("Valor inválido!\n"));
+                        limparBuffer();
+                    }
 
                 }while(g.t.tam<3 || g.t.tam>9);
                 if(g.t.tam>=5){
@@ -99,7 +105,6 @@ void opcoes(){
                 limparBuffer();
                 break;
             case '3':
-
                 if(g.parametro==1)
                     g=jogo(g,1);
                 else 
@@ -184,6 +189,7 @@ Geral jogo(Geral g, int parametro){
         }
         else if(!strcmp(opcao,"dica") && tam==5){
             g.t.resposta=dica(g.t);
+            g.t.quant_manter++;
         }
         else if(!strcmp(opcao,"resolver") && tam==9){
             g.t.resposta=resolver(g.t);
@@ -203,7 +209,7 @@ Geral jogo(Geral g, int parametro){
         }
         montarTab(g.t,g.s);
 
-        vitoria=verificaVitoria(g.t);
+        vitoria=verificaVitoria(g.t, g.s);
         free(opcao);
 
     }
@@ -238,30 +244,48 @@ int ** dica(Tabela t){ // Essa função seleciona um valor aleatório (desde que
         l = rand()%n;
         c = rand()%n;
         
-        if(t.resposta[l][c]==0 && t.gabarito[l][c]==1){
+        if((t.resposta[l][c]==2||t.resposta[l][c]==0) && t.gabarito[l][c]==1){
             t.resposta[l][c]=1;
             return t.resposta;
         }
-        
     }while(t.gabarito[l][c]==2 || t.resposta[l][c]!=0);
-
 }
 
-int verificaVitoria(Tabela t){ //Essa função irá comparar os valores colocados pelo jogador na matriz resposta com a matriz gabarito
+int verificaVitoria(Tabela t, Soma s){ //Essa função irá comparar os valores colocados pelo jogador na matriz resposta com a matriz gabarito
 
-    int n=t.tam, auxr=0,aux=0;
+    int n=t.tam, auxr=0,aux=0,somal,somac, subl, subc;
 
     for(int i=0; i<n; i++){
-        for(int j=0; j<n; j++){
-            if(t.resposta[i][j]==t.gabarito[i][j]){
-                if(t.resposta[i][j]==2)
-                    auxr++;
-                aux++;
+            somal=0;
+            somac=0;
+            subl=0;
+            subc=0;
+            for(int j=0; j<n; j++){
+                if(t.resposta[i][j]==1)
+                    somal+=t.mat[i][j];
+                if(t.resposta[j][i]==1)
+                    somac+=t.mat[j][i];
+                subl+=t.mat[i][j];
+                subc+=t.mat[j][i];
             }
-                 
-        }        
+            for(int j=0; j<n; j++){
+                if(t.resposta[i][j]==2)
+                    subl-=t.mat[i][j];
+                if(t.resposta[j][i]==2)
+                    subc-=t.mat[j][i];    
+            }
+
+            if(somal==s.linha[i])
+                aux++;
+            if(somac==s.coluna[i])
+                aux++;
+            if(subl==s.linha[i])
+                auxr++;
+            if(subc==s.coluna[i])
+                auxr++;         
     }
-    if(auxr==t.quant_remover_total || aux==n*n)
+
+    if(auxr==n*2 || aux==n*2)
         return 1;
     else
         return 0;
@@ -529,6 +553,7 @@ void ranking(char * nome,int tempo, int n, int param){ //Essa é a função gera
 Ranking armazenaRanking(Ranking r) {
     FILE *arq = fopen("sumplete.ini", "r");
     char linha[M], nome[M], numero[2];
+    strcpy(linha, "");
     int n, tam_total, aux, i;
 
     while (!feof(arq)) {
@@ -619,8 +644,14 @@ void mostraRanking(Ranking r){ //Essa função pega os valores armazenados do ra
             printf("Tamanho do Tabuleiro - %d\n", i+3);
             for(int j=0; j<QUANTJOGADOR; j++){
                 if(r.tempo[i][j]!=0){
-                    printf("%d° Lugar - %s\n", j+1, r.nome[i][j]);
-                    printf("Tempo - %d\n", r.tempo[i][j]);
+                    if(j+1==1 || j+1==2 || j+1==3){
+                        printf(YELLOW("%d° Lugar - %s\n"), j+1, r.nome[i][j]);
+                        printf(YELLOW("Tempo - %d\n"), r.tempo[i][j]);
+                    }
+                    else{
+                        printf("%d° Lugar - %s\n", j+1, r.nome[i][j]);
+                        printf("Tempo - %d\n", r.tempo[i][j]);
+                    }
                 }
             }
             printf("\n");
@@ -766,7 +797,6 @@ int * criaVetor(int n){ //Essa função cria um vetor
 
     for(int i=0; i<n; i++)
         vet[i]=0;
-
     return vet;
 }
 
@@ -781,9 +811,4 @@ void limpamatriz(int ***mat, int n){ //Essa função limpa a matriz alocada dina
 void limpavetor(int **vet){ //Essa função limpa o vetor alocado dinamicamente
 
     free(*vet);
-}
-
-void limpachar(char *op){
-
-    free(op);
 }
