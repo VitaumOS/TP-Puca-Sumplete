@@ -141,8 +141,8 @@ int verificaNomeArquivo(char *arquivo){
 Geral jogo(Geral g, int parametro){
 
     int vitoria=0;
-    int r, len,tam;
-    char *opcao;
+    int r, tam;
+
     g.j.tempoI=time(NULL);
 
     
@@ -176,30 +176,27 @@ Geral jogo(Geral g, int parametro){
         tam=strlen(g.t.opcao);
         system("clear");
 
-        dividePalavra(g.t.opcao, &opcao);
-        len=strlen(opcao);
-
-        if(!strcmp(opcao, "manter") && tam==10){
-            g.t.resposta=resposta(len, g.t.opcao, g.t.resposta,g.t.tam,1);
+        if(strstr(g.t.opcao, "manter")!=NULL && tam==10){
+            g.t.resposta=resposta(7, g.t.opcao, g.t.resposta,g.t.tam,1);
             g.t.quant_manter++;
         }
-        else if(!strcmp(opcao,"remover") && tam==11){
-            g.t.resposta=resposta(len, g.t.opcao, g.t.resposta,g.t.tam,2);
+        else if(strstr(g.t.opcao, "remover")!=NULL && tam==11){
+            g.t.resposta=resposta(8, g.t.opcao, g.t.resposta,g.t.tam,2);
             g.t.quant_remover++;
         }
-        else if(!strcmp(opcao,"dica") && tam==5){
+        else if(strstr(g.t.opcao, "dica")!=NULL && tam==5){
             g.t.resposta=dica(g.t);
             g.t.quant_manter++;
         }
-        else if(!strcmp(opcao,"resolver") && tam==9){
+        else if(strstr(g.t.opcao, "resolver")!=NULL && tam==9){
             g.t.resposta=resolver(g.t);
         }
-        else if(!strcmp(opcao,"salvar")){
+        else if(strstr(g.t.opcao, "salvar")!=NULL){
             g.j.tempoF=time(NULL)-g.j.tempoI;
-            salvaArquivo(len,g.t,g.s,g.j);
+            salvaArquivo(6,g.t,g.s,g.j);
             printf("Jogo Salvo!\n");
         }
-        else if(!strcmp(opcao,"voltar") && tam==7){
+        else if(strstr(g.t.opcao, "voltar")!=NULL && tam==7){
             g.parametro=1;
             g.j.tempoT=(time(NULL)-g.j.tempoI)+g.j.tempoT;
             return g;
@@ -210,8 +207,6 @@ Geral jogo(Geral g, int parametro){
         montarTab(g.t,g.s);
 
         vitoria=verificaVitoria(g.t, g.s);
-        free(opcao);
-
     }
     g.j.tempoF=(time(NULL)-g.j.tempoI)+g.j.tempoT;
     printf("VOCÊ GANHOU!\n");
@@ -369,6 +364,7 @@ Soma criaLinhaColuna(Tabela tab){ //Essa função soma as linhas e colunas basea
 void montarTab(Tabela t, Soma vet){ //Essa função monta a tabela do jogo com os valores gerados aleatoriamente
     
     int n = t.tam;
+    int soma=0;
     
     //___________________________________________
     // Essa parte gera a parte de cima da tabela
@@ -432,7 +428,15 @@ void montarTab(Tabela t, Soma vet){ //Essa função monta a tabela do jogo com o
             else
                 printf("  %d   ", t.mat[i][j]);
         }
-        printf(TAB_VER BOLD("  %02d  "), vet.linha[i]);
+        soma=0;
+        for(int j=0; j<n; j++){
+            if(t.resposta[i][j]==1)
+                soma+=t.mat[i][j];
+        }
+        if(soma==vet.linha[i])
+            printf(TAB_VER BOLD(GREEN("  %02d  ")), vet.linha[i]);
+        else
+            printf(TAB_VER BOLD("  %02d  "), vet.linha[i]);
         if(vet.linha[i]>-10)
             printf(" ");
         printf(TAB_VER "\n");        
@@ -461,7 +465,15 @@ void montarTab(Tabela t, Soma vet){ //Essa função monta a tabela do jogo com o
     for(int i=0; i<8; i++)
         printf(" ");
     for(int i=0; i<n; i++){
-        printf( TAB_VER BOLD("  %02d  "), vet.coluna[i]);
+        soma=0;
+        for(int j=0; j<n; j++){
+            if(t.resposta[j][i]==1)
+                soma+=t.mat[j][i];
+        }
+        if(soma==vet.coluna[i])
+            printf( TAB_VER BOLD(GREEN("  %02d  ")), vet.coluna[i]);
+        else
+            printf( TAB_VER BOLD("  %02d  "), vet.coluna[i]);
         if(vet.coluna[i]>-10)
             printf(" ");
     }
@@ -495,10 +507,10 @@ int ** resposta(int l, char *op, int** resposta, int tam,int n){
     char lin[2], col[2];
 
 
-    lin[0]=op[l+1];
+    lin[0]=op[l];
     lin[1]='\0';
 
-    col[0]=op[l+2];
+    col[0]=op[l+1];
     col[1]='\0';
 
     linha=atoi(lin)-1;

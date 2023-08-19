@@ -114,6 +114,8 @@ do{
                 quant_zero++;
     }
 
+    printf("QUANT ZERO: %d\n", quant_zero);
+
 
     if(quant_zero>0){
         if(matgab[l][c]==1)
@@ -315,7 +317,7 @@ do{
                     aux++;
         
     cont++;
-    }while(aux!=(t.tam*t.tam) && cont<=10);
+    }while(aux!=(t.tam*t.tam) && cont<10);
     }
     
     aux2=0;
