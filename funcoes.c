@@ -34,9 +34,7 @@ void opcoes(){
 
         } while ((strlen(opcao) != 2) || (op < '0' || op > '4'));
 
-
         switch(op){
-
             case '0': 
 
                 if(g.parametro==2)
@@ -58,9 +56,7 @@ void opcoes(){
                 g.j.tam_nome=strlen(g.j.nome);
                 g.j.nome[g.j.tam_nome-1]='\0';
                 system("clear");
-
                 do{
-
                     printf("%s, digite a dimensão que deseja (de 3 a 9): ", g.j.nome);
 
                     fgets(opcao, 4, stdin);
@@ -71,7 +67,6 @@ void opcoes(){
                         printf(RED("Valor inválido!\n"));
                         limparBuffer();
                     }
-
                 }while(g.t.tam<3 || g.t.tam>9);
                 if(g.t.tam>=5){
                     do{
@@ -123,6 +118,7 @@ void opcoes(){
 }
 
 int verificaNomeArquivo(char *arquivo){
+    
     int tam,aux=0;
     char formato[6];
     tam=strlen(arquivo);
@@ -223,6 +219,7 @@ Geral jogo(Geral g, int parametro){
 }
 
 int ** resolver(Tabela t){ //Essa função copia os valores da matriz gabarito para a matriz resposta
+
     int n=t.tam;
     for(int i=0; i<n; i++)
         for(int j=0; j<n; j++)
@@ -366,7 +363,6 @@ void montarTab(Tabela t, Soma vet){ //Essa função monta a tabela do jogo com o
     int n = t.tam;
     int soma=0;
     
-    //___________________________________________
     // Essa parte gera a parte de cima da tabela
     for(int i=0; i<8; i++)
         printf(" ");
@@ -381,10 +377,8 @@ void montarTab(Tabela t, Soma vet){ //Essa função monta a tabela do jogo com o
         else
             printf(TAB_TJ);   
     }
-    //___________________________________________
 
     printf("\n");
-    //___________________________________________
     //Essa parte mostra os números da matriz junto com as partes intermediárias da tabela
     for(int i=0; i<n; i++){
 
@@ -411,7 +405,6 @@ void montarTab(Tabela t, Soma vet){ //Essa função monta a tabela do jogo com o
                 else
                     printf(TAB_MJ);
             }
-   
         }
         printf("\n");
         printf(TAB_VER);
@@ -460,7 +453,7 @@ void montarTab(Tabela t, Soma vet){ //Essa função monta a tabela do jogo com o
             }
         }
     }
-    //___________________________________________
+
     printf("\n");
     for(int i=0; i<8; i++)
         printf(" ");
@@ -481,7 +474,6 @@ void montarTab(Tabela t, Soma vet){ //Essa função monta a tabela do jogo com o
     printf("\n");
 
 
-    //___________________________________________
     //Essa parte gera a parte debaixo da tabela
     for(int i=0; i<8; i++)
         printf(" ");
@@ -497,8 +489,6 @@ void montarTab(Tabela t, Soma vet){ //Essa função monta a tabela do jogo com o
             printf(TAB_BJ);
     }
     printf("\n");
-    //___________________________________________
-    
 }
 
 int ** resposta(int l, char *op, int** resposta, int tam,int n){
@@ -559,10 +549,10 @@ void ranking(char * nome,int tempo, int n, int param){ //Essa é a função gera
     }
     free(ranking.nome);
     free(ranking.tempo);
-
 }
 
 Ranking armazenaRanking(Ranking r) {
+
     FILE *arq = fopen("sumplete.ini", "r");
     char linha[M], nome[M], numero[2];
     strcpy(linha, "");
@@ -607,6 +597,7 @@ Ranking armazenaRanking(Ranking r) {
 
 
 Ranking adicionaNovoRanking(char *nome, int tempo, int n, Ranking r) {//Essa função pega o novo jogador e seu tempo e o coloca na sua devida posição dentro das variáveis
+    
     int i = 0, aux1 = tempo, aux2;
     n-=3;
     char c_aux1[M], c_aux2[M];
@@ -632,6 +623,7 @@ Ranking adicionaNovoRanking(char *nome, int tempo, int n, Ranking r) {//Essa fun
 }
 
 void atualizaRanking(Ranking r){ //Essa função atualiza o arquivo "sumplete.ini" quando tem-se um novo jogador
+
     FILE *arq=fopen("sumplete.ini","w");
     for(int i=0; i<QUANTDIMENSOES; i++){
 
@@ -672,6 +664,7 @@ void mostraRanking(Ranking r){ //Essa função pega os valores armazenados do ra
 }
 
 Geral abreArquivo(char *nome_arq) {
+
     FILE *arq = fopen(nome_arq, "r");
     Geral g;
 
@@ -777,19 +770,9 @@ void salvaArquivo(int l, Tabela t, Soma s, Jogador j){ //Essa função cria o ar
 }
 
 void limparBuffer() { //Essa função limpa o buffer
+
     int c;
     while ((c = getchar()) != '\n' && c != EOF);
-}
-
-void dividePalavra(char *op, char **opcao) {//Essa função irá dividir a primeira palavra de uma frase e retorná-la
-    int i = 0;
-    while (op[i] != ' ' && op[i] != '\n' && op[i] != '\0') {
-        i++;
-    }
-    *opcao = malloc((i+1) * sizeof(char));
-    for (int j = 0; j < i; j++)
-        (*opcao)[j] = op[j];
-    (*opcao)[i] = '\0';
 }
 
 int ** criaMatriz(int n){ //Essa função cria uma matriz
@@ -811,7 +794,6 @@ int * criaVetor(int n){ //Essa função cria um vetor
         vet[i]=0;
     return vet;
 }
-
 
 void limpamatriz(int ***mat, int n){ //Essa função limpa a matriz alocada dinamicamente
 

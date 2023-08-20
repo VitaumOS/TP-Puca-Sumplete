@@ -125,7 +125,6 @@ void montarTab(Tabela t, Soma vet);
 void limpavetor(int **vet);
 void ranking(char *nome,int tempo, int n, int param);
 void mostraRanking(Ranking r);
-void dividePalavra(char *op, char **opcao);
 
 Tabela criarMatrizEspelho(Tabela t);
 
