@@ -151,7 +151,7 @@ Geral jogo(Geral g, int parametro){
         g.t.mat=criaMatriz(g.t.tam);
         g.t.resposta=criaMatriz(g.t.tam);
         g.t.mat=geravalores(g.t.mat, g.t.tam, g.t.dificuldade);
-        g.t=criarMatrizEspelho(g.t);
+        g.t=criarMatrizGabarito(g.t);
         g.s=criaLinhaColuna(g.t);
     }
 
@@ -189,8 +189,8 @@ Geral jogo(Geral g, int parametro){
         }
         else if(strstr(g.t.opcao, "salvar")!=NULL){
             g.j.tempoF=time(NULL)-g.j.tempoI;
-            salvaArquivo(6,g.t,g.s,g.j);
-            printf("Jogo Salvo!\n");
+            if(salvaArquivo(6,g.t,g.s,g.j))
+                printf("Jogo Salvo!\n");
         }
         else if(strstr(g.t.opcao, "voltar")!=NULL && tam==7){
             g.parametro=1;
@@ -305,43 +305,89 @@ int ** geravalores(int **mat, int n, char d){ //Essa função gera os valores al
 }
 
 
-Tabela criarMatrizEspelho(Tabela t){ //Essa função irá criar uma matriz que possuirá os resultados da matriz original
+Tabela criarMatrizGabarito(Tabela t){ //Essa função irá criar uma matriz que possuirá os resultados da matriz original
     
-    int m, n=t.tam, somal=0,aux=0; 
-    int *somac=criaVetor(n);
+    int m, n=t.tam, somal=0,auxl=0,aux=0;
+    int *auxc=criaVetor(n);
     t.quant_remover_total=0;
     t.gabarito=criaMatriz(n);
-    do{ 
-        aux=0;
-        for(int i=0; i<n; i++)
-            somac[i]=0;
-        for(int i=0; i<n; i++){       
-            do{
-                somal=0;
-                for(int j=0; j<n; j++){
-                    m=rand()%2;
+    switch(t.dificuldade){
+        case 'F':
+            for(int i=0; i<n; i++){       
+                        for(int j=0; j<n; j++){
+                            m=rand()%2;
+                            if(m){ //Aqui, em 50% das vezes, um valor será escolhido para a soma
+                                t.gabarito[i][j]=1;
+                            }
+                            else{//Nos outros 50%, o valor nn será escolhido, tendo o valor zero
+                                t.gabarito[i][j]=2;
+                                t.quant_remover_total++;
+                            }
+                        }
+            }
+            break;
+        case 'M':
+            do{ 
+                aux=0;
+                for(int i=0; i<n; i++)
+                    auxc[i]=0;
+                for(int i=0; i<n; i++){       
+                    do{
+                        auxl=0;
+                        for(int j=0; j<n; j++){
+                            m=rand()%2;
 
-                    if(m){ //Aqui, em 50% das vezes, um valor será escolhido para a soma
-                        t.gabarito[i][j]=1;
-                        somal+=t.mat[i][j];
-                        somac[j]+=t.mat[i][j];
-                    }
-                    else{//Nos outros 50%, o valor nn será escolhido, tendo o valor zero
-                        t.gabarito[i][j]=2;
-                        t.quant_remover_total++;
-                    }
+                            if(m){ //Aqui, em 50% das vezes, um valor será escolhido para a soma
+                                t.gabarito[i][j]=1;
+                                auxl++;
+                                auxc[j]++;
+                            }
+                            else{//Nos outros 50%, o valor nn será escolhido, tendo o valor zero
+                                t.gabarito[i][j]=2;
+                                t.quant_remover_total++;
+                            }
+                        }
+
+                    }while(auxl==0 || auxl==n);
                 }
+                for(int i=0; i<n; i++)
+                    if(auxc[i]==0 || auxc[i]==n)
+                        aux=1;
+            }while(aux==1);
+            break;
+        case 'D':
+            do{ 
+                aux=0;
+                for(int i=0; i<n; i++)
+                    auxc[i]=0;
 
-            }while(somal==0);
-        }
-        for(int i=0; i<n; i++)
-            if(somac[i]==0)
-                aux=1;
-    }while(aux==1);
-    free(somac);
+                for(int i=0; i<n; i++){       
+                    do{
+                        auxl=0;
+                        for(int j=0; j<n; j++){
+                            m=rand()%2;
+
+                            if(m){ //Aqui, em 50% das vezes, um valor será escolhido para a soma
+                                t.gabarito[i][j]=1;
+                                auxl++;
+                                auxc[j]++;     
+                            }
+                            else{//Nos outros 50%, o valor nn será escolhido, tendo o valor zero
+                                t.gabarito[i][j]=2;
+                                t.quant_remover_total++;
+                            }
+                        }
+                    }while(auxl==n);
+                }
+                for(int i=0; i<n; i++)
+                    if(auxc[i]==n)
+                        aux=1;
+            }while(aux==1);
+            break;
+    }    
+    free(auxc);
     return t;
 }
-
 Soma criaLinhaColuna(Tabela tab){ //Essa função soma as linhas e colunas baseadas na matriz gabarito
 
     Soma vet;
@@ -719,8 +765,7 @@ Geral abreArquivo(char *nome_arq) {
     return g;
 }
 
-
-void salvaArquivo(int l, Tabela t, Soma s, Jogador j){ //Essa função cria o arquivo com o nome desejado pelo jogador
+int salvaArquivo(int l, Tabela t, Soma s, Jogador j){ //Essa função cria o arquivo com o nome desejado pelo jogador
 
     char nome[M];
     l++;//Pulando o espaço do comando 'salvar texto.txt'
@@ -732,8 +777,10 @@ void salvaArquivo(int l, Tabela t, Soma s, Jogador j){ //Essa função cria o ar
         l++;
     }
     nome[n]='\0';
-        
 
+    if(!verificaNomeArquivo(nome))
+        return 0;
+        
     FILE * arq=fopen(nome, "w");//Criação do arquivo com o nome escolhido pelo jogador
 
     fprintf(arq,"%d\n", t.tam); // Essa parte coloca no arquivo a dimensão da matriz e, em seguida, os valores da matriz
@@ -767,6 +814,7 @@ void salvaArquivo(int l, Tabela t, Soma s, Jogador j){ //Essa função cria o ar
     fprintf(arq,"%d", j.tempoF);
 
     fclose(arq);
+    return 1;
 }
 
 void limparBuffer() { //Essa função limpa o buffer

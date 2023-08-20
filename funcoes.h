@@ -117,7 +117,6 @@ typedef struct{
 #define TAB_BR  "\u251B" // ┛ (bottom-right)
  
 void atualizaRanking(Ranking r);
-void salvaArquivo(int l, Tabela t, Soma s, Jogador j);
 void limparBuffer();
 void opcoes();
 void limpamatriz(int ***mat, int n);
@@ -126,7 +125,7 @@ void limpavetor(int **vet);
 void ranking(char *nome,int tempo, int n, int param);
 void mostraRanking(Ranking r);
 
-Tabela criarMatrizEspelho(Tabela t);
+Tabela criarMatrizGabarito(Tabela t);
 
 Soma criaLinhaColuna(Tabela tab);
 
@@ -138,6 +137,7 @@ Geral abreArquivo(char * nome_arq);
 
 int verificaVitoria(Tabela t, Soma s);
 int verificaNomeArquivo(char *arquivo);
+int salvaArquivo(int l, Tabela t, Soma s, Jogador j);
 
 int * criaVetor(int n);
 
