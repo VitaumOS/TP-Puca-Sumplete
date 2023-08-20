@@ -16,7 +16,6 @@ typedef struct{
     
     int *linha;
     int *coluna;
-
 }Soma;
 
 typedef struct{
@@ -124,6 +123,7 @@ void montarTab(Tabela t, Soma vet);
 void limpavetor(int **vet);
 void ranking(char *nome,int tempo, int n, int param);
 void mostraRanking(Ranking r);
+int ** resolveGabarito(Tabela t, Soma s);
 
 Tabela criarMatrizGabarito(Tabela t);
 
