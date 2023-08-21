@@ -3,7 +3,7 @@
 
 void opcoes(){ //Função em que terá o menu inicial do jogo
 
-    char opcao[4], op;
+    char opcao[50], op;
     char nome_arquivo[M];
     Geral g;
     g.parametro=0;
@@ -21,14 +21,13 @@ void opcoes(){ //Função em que terá o menu inicial do jogo
 
             printf("Escolha a opção: ");
             
-            fgets(opcao, 4, stdin);
+            fgets(opcao, 50, stdin);
             op = opcao[0];
             
             system("clear");
             
             if ((strlen(opcao) != 2) || (op < '0' || op > '4')) { //Isso evita que o jogador escolha uma opção errada
                 printf(RED("Opção Inválida!\n"));
-                limparBuffer();
             }
 
         } while ((strlen(opcao) != 2) || (op < '0' || op > '4')); //Usuário ficará no loop enquanto ele digitar a opção errada
@@ -49,6 +48,15 @@ void opcoes(){ //Função em que terá o menu inicial do jogo
                 printf("Obrigado por jogar!\n");
                 break;
             case '1': //Caso '1': Inicia um novo jogo
+
+                if(g.parametro==1 || g.parametro==3){// Caso o usuário já tenha acessado o jogo anteriormente, é liberado a memória antes de alocar mais uma
+                    limpamatriz(&g.t.mat, g.t.tam);
+                    limpamatriz(&g.t.resposta, g.t.tam);
+                    limpamatriz(&g.t.gabarito, g.t.tam);
+                    limpavetor(&g.s.linha);
+                    limpavetor(&g.s.coluna);
+                    g.parametro=0;
+                }
                 
                 //Primeiro, pede o nome do jogador
                 printf("Primeiramente, digite seu nome: ");
@@ -59,37 +67,46 @@ void opcoes(){ //Função em que terá o menu inicial do jogo
                 do{//Aqui, ele ficará num loop caso digite o tamanho de dimensão errada
                     printf("%s, digite a dimensão que deseja (de 3 a 9): ", g.j.nome);
 
-                    fgets(opcao, 4, stdin);
+                    fgets(opcao, 50, stdin);
                     g.t.tam = atoi(opcao); //Para evitar problemas na entrada, o usuário digita uma string e depois a converte em inteiro
 
                     system("clear");
                     if(g.t.tam<3 || g.t.tam>9){
                         printf(RED("Valor inválido!\n"));
-                        limparBuffer();
                     }
                 }while(g.t.tam<3 || g.t.tam>9);
                 if(g.t.tam>=5){ //O menu de dificuldades só aparece caso o tamanho do tabuleiro seja maior ou igual a 5
                     do{
-
-                        printf("Agora, digite a dificuldade (Fácil | Médio | Difícil): ");
-                        scanf(" %c", &g.t.dificuldade);
-                        limparBuffer();
+                        g.t.dificuldade=' ';
+                        printf("Digite a dificuldade (Fácil | Médio | Difícil): ");
+                        fgets(opcao,50,stdin);
+                        if(opcao[1]=='\n')
+                            g.t.dificuldade=opcao[0];
+                        
                         system("clear");
-                        if(g.t.dificuldade!='F' && g.t.dificuldade!='M' && g.t.dificuldade!='D')
+                        if(g.t.dificuldade!='F' && g.t.dificuldade!='M' && g.t.dificuldade!='D'){
                             printf(RED("Valor inválido!\n"));
-                        else if(g.t.tam<=6 && g.t.dificuldade=='D')
+                        }
+                        else if(g.t.tam<=6 && g.t.dificuldade=='D'){
                             printf(RED("Dificuldade inválida!\n"));
+                        }
 
                     }while((g.t.dificuldade!='F' && g.t.dificuldade!='M' && g.t.dificuldade!='D') || (g.t.tam<=6 && g.t.dificuldade=='D'));
                 }
                 else //Caso seja abaixo de 5 o tamanho do tabuleiro, automaticamente a dificuldade será no fácil
                     g.t.dificuldade='F';
-                
-                g=jogo(g,0); //Acessa a função principal com o parâmetro 0 (iniciando novo jogo)
+                g=jogo(g,g.parametro); //Acessa a função principal com o parâmetro 0 (iniciando novo jogo)
 
                 break;
             case '2': //Caso '2': Pega o nome do arquivo.txt e o coloca no jogo
 
+                if(g.parametro==1 || g.parametro==3){ 
+                    limpamatriz(&g.t.mat, g.t.tam);
+                    limpamatriz(&g.t.resposta, g.t.tam);
+                    limpamatriz(&g.t.gabarito, g.t.tam);
+                    limpavetor(&g.s.linha);
+                    limpavetor(&g.s.coluna);
+                }
                 printf("Digite o nome do arquivo: ");
                 scanf("%s", nome_arquivo);
                 if(verificaNomeArquivo(nome_arquivo)){//Verifica se o arquivo é do formato texto (txt)
@@ -97,7 +114,6 @@ void opcoes(){ //Função em que terá o menu inicial do jogo
                     if(g.parametro==1 || g.parametro==3)
                         g=jogo(g,g.parametro);
                 }
-                limparBuffer();
                 system("clear");
                 break;
             case '3':// Caso '3': Continua um jogo já iniciado
@@ -127,7 +143,7 @@ int verificaNomeArquivo(char *arquivo){ // Essa função verifica se o formato d
         formato[aux]=arquivo[i];
         aux++;
     }
-    if(!strcmp(formato,".txt"))
+    if(strstr(formato,".txt")!=NULL)
         return 1;
     else{
         printf("Formato incorreto!\n");
@@ -200,10 +216,13 @@ Geral jogo(Geral g, int parametro){ //Nessa função ocorre o jogo em si
             g.j.tempoF=time(NULL)-g.j.tempoI;
             if(salvaArquivo(6,g.t,g.s,g.j))
                 printf("Jogo Salvo!\n");
+            else
+                printf(RED("Erro ao acessar o arquivo!\n"));
         }
         else if(strstr(g.t.opcao, "voltar")!=NULL && tam==7){// Função "voltar": o jogo volta para o menu principal
-            if(g.parametro!=3)
+            if(g.parametro!=3){
                 g.parametro=1;
+            }
             g.j.tempoT=(time(NULL)-g.j.tempoI)+g.j.tempoT;
             return g;
         }
@@ -791,6 +810,8 @@ int salvaArquivo(int l, Tabela t, Soma s, Jogador j){ //Essa função cria o arq
     char nome[M];
     l++;//Pulando o espaço do comando 'salvar texto.txt'
     int n=0;
+    if(t.opcao[l]=='\0')
+        return 0;
     
     while(t.opcao[l]!='\n'){ //Esse while vai pegar o nome escolhido pelo jogador para salvar
         nome[n]=t.opcao[l];
