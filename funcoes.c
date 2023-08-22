@@ -37,7 +37,7 @@ void opcoes(){ //Função em que terá o menu inicial do jogo
 
                 if(g.parametro==2)
                     ranking(g.j.nome,g.j.tempoF,g.t.tam, 1);
-                else if(g.parametro==1 || g.parametro==3){
+                else if(g.parametro==1 || g.parametro==3 ){
                     limpamatriz(&g.t.mat, g.t.tam);
                     limpamatriz(&g.t.resposta, g.t.tam);
                     limpamatriz(&g.t.gabarito, g.t.tam);
@@ -55,7 +55,7 @@ void opcoes(){ //Função em que terá o menu inicial do jogo
                     limpamatriz(&g.t.gabarito, g.t.tam);
                     limpavetor(&g.s.linha);
                     limpavetor(&g.s.coluna);
-                    g.parametro=0;
+                    
                 }
                 
                 //Primeiro, pede o nome do jogador
@@ -95,6 +95,7 @@ void opcoes(){ //Função em que terá o menu inicial do jogo
                 }
                 else //Caso seja abaixo de 5 o tamanho do tabuleiro, automaticamente a dificuldade será no fácil
                     g.t.dificuldade='F';
+                g.parametro=0;
                 g=jogo(g,g.parametro); //Acessa a função principal com o parâmetro 0 (iniciando novo jogo)
 
                 break;
@@ -798,7 +799,6 @@ Geral abreArquivo(char *nome_arq) { // Abre e armazena todas as informações do
         for (int j = 0; j < n; j++) {
             if (g.t.gabarito[i][j] == 0) {
                 g.parametro = 3;
-                break;
             }
         }
     }
@@ -957,24 +957,29 @@ int ** resolveGabarito(Tabela t, Soma s){ // Essa função tenta criar a matriz 
                 for(int j=0; j<t.tam; j++)
                     if(t.gabarito[i][j]!=linha[k][j] && t.gabarito[i][j]!=0)
                             linha[k][t.tam]=2;
-                    if(soma==s.linha[i] && linha[k][t.tam]!=2){
-                        quant++;
-                        linha[k][t.tam]=1;
-                    }  
+                if(soma==s.linha[i] && linha[k][t.tam]!=2){
+                    quant++;
+                    linha[k][t.tam]=1;
+                }  
             }
-            if(quant==1)
-                for(int k=0; k<n; k++)
-                    if(linha[k][t.tam]==1)
-                        for(int j=0; j<t.tam; j++)
+            if(quant==1){
+                for(int k=0; k<n; k++){
+                    if(linha[k][t.tam]==1){
+                        for(int j=0; j<t.tam; j++){
                             linhaF[j]=linha[k][j];
-        
-            else              
+                        }
+                    }    
+                }
+            }
+            else{  
                 for(int j=0; j<t.tam; j++)
-                    linhaF[j]=0;  
+                    linhaF[j]=0; 
+            }
 
-            for(int j=0; j<t.tam; j++)
+            for(int j=0; j<t.tam; j++){
                 if(t.gabarito[i][j]==0)
                     t.gabarito[i][j]=linhaF[j];
+            }
                 
         }
 
@@ -994,23 +999,28 @@ int ** resolveGabarito(Tabela t, Soma s){ // Essa função tenta criar a matriz 
                 for(int j=0; j<t.tam; j++)
                     if(t.gabarito[j][i]!=linha[k][j] && t.gabarito[j][i]!=0)
                         linha[k][t.tam]=2;
-                    if(soma==s.coluna[i] && linha[k][t.tam]!=2){
-                        quant++;
-                        linha[k][t.tam]=1;
-                    }  
+                if(soma==s.coluna[i] && linha[k][t.tam]!=2){
+                    quant++;
+                    linha[k][t.tam]=1;
+                }  
+            }
+            if(quant==1){
+                for(int k=0; k<n; k++){
+                    if(linha[k][t.tam]==1){
+                        for(int j=0; j<t.tam; j++){          
+                            linhaF[j]=linha[k][j];
+                        }
+                    }    
                 }
-                if(quant==1)
-                    for(int k=0; k<n; k++)
-                        if(linha[k][t.tam]==1)
-                            for(int j=0; j<t.tam; j++)                           
-                                linhaF[j]=linha[k][j];     
-                else
-                    for(int j=0; j<t.tam; j++)
-                        linhaF[j]=0; 
-                
+            }     
+            else{
                 for(int j=0; j<t.tam; j++)
-                    if(t.gabarito[j][i]==0)
-                        t.gabarito[j][i]=linhaF[j];
+                    linhaF[j]=0; 
+            }  
+            for(int j=0; j<t.tam; j++){
+                if(t.gabarito[j][i]==0)
+                    t.gabarito[j][i]=linhaF[j];
+            }
         }
         aux=0;
         for(int i=0; i<t.tam; i++)
